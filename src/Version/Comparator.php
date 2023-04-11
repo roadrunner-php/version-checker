@@ -12,9 +12,7 @@ final class Comparator implements ComparatorInterface
      */
     public function greaterThan(string $requested, string $installed): bool
     {
-        // TODO need implementation
-
-        return true;
+        return \version_compare($installed, $requested) >= 0;
     }
 
     /**
@@ -23,9 +21,7 @@ final class Comparator implements ComparatorInterface
      */
     public function lessThan(string $requested, string $installed): bool
     {
-        // TODO need implementation
-
-        return true;
+        return \version_compare($installed, $requested) <= 0;
     }
 
     /**
@@ -34,8 +30,6 @@ final class Comparator implements ComparatorInterface
      */
     public function equal(string $requested, string $installed): bool
     {
-        // TODO need implementation
-
-        return true;
+        return \version_compare($installed, $requested) === 0;
     }
 }
