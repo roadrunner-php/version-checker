@@ -1,0 +1,16 @@
+on:
+    pull_request: null
+    push:
+        branches:
+            - master
+
+name: coding-standards
+
+jobs:
+    psalm:
+        uses: spiral/gh-actions/.github/workflows/cs.yml@master
+        with:
+            os: >-
+                ['ubuntu-latest']
+            php: >-
+                ['8.1']
