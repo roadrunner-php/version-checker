@@ -7,7 +7,7 @@ namespace RoadRunner\VersionChecker\Version;
 interface RequiredInterface
 {
     /**
-     * @return non-empty-string
+     * @return non-empty-string|null
      */
-    public function getRequiredVersion(): string;
+    public function getRequiredVersion(): ?string;
 }

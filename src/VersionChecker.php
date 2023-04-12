@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker;
 
+use RoadRunner\VersionChecker\Exception\RequiredVersionException;
 use RoadRunner\VersionChecker\Exception\RoadrunnerNotInstalledException;
 use RoadRunner\VersionChecker\Exception\UnsupportedVersionException;
 use RoadRunner\VersionChecker\Version\Comparator;
@@ -27,12 +28,21 @@ final class VersionChecker
      *
      * @throws UnsupportedVersionException
      * @throws RoadrunnerNotInstalledException
+     * @throws RequiredVersionException
      */
     public function greaterThan(?string $version = null): void
     {
         if (empty($version)) {
             $version = $this->requiredVersion->getRequiredVersion();
         }
+
+        if (empty($version)) {
+            throw new RequiredVersionException(
+                'Unable to determine required RoadRunner version.' .
+                ' Please specify the required version in the `$version` parameter.'
+            );
+        }
+
         $installedVersion = $this->installedVersion->getInstalledVersion();
 
         if (!$this->comparator->greaterThan($version, $installedVersion)) {

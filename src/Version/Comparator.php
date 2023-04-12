@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Version;
 
+use Composer\Semver\Comparator as SemverComparator;
+
 final class Comparator implements ComparatorInterface
 {
     /**
@@ -12,7 +14,7 @@ final class Comparator implements ComparatorInterface
      */
     public function greaterThan(string $requested, string $installed): bool
     {
-        return \version_compare($installed, $requested) >= 0;
+        return SemverComparator::greaterThanOrEqualTo($installed, $requested);
     }
 
     /**
@@ -21,7 +23,7 @@ final class Comparator implements ComparatorInterface
      */
     public function lessThan(string $requested, string $installed): bool
     {
-        return \version_compare($installed, $requested) <= 0;
+        return SemverComparator::lessThanOrEqualTo($installed, $requested);
     }
 
     /**
@@ -30,6 +32,6 @@ final class Comparator implements ComparatorInterface
      */
     public function equal(string $requested, string $installed): bool
     {
-        return \version_compare($installed, $requested) === 0;
+        return SemverComparator::equalTo($installed, $requested);
     }
 }

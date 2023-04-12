@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace RoadRunner\VersionChecker\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use RoadRunner\VersionChecker\Exception\RequiredVersionException;
 use RoadRunner\VersionChecker\Exception\UnsupportedVersionException;
 use RoadRunner\VersionChecker\Version\ComparatorInterface;
 use RoadRunner\VersionChecker\Version\InstalledInterface;
@@ -59,6 +60,29 @@ final class VersionCheckerTest extends TestCase
         );
 
         $checker->greaterThan('1.0');
+    }
+
+    public function testGreaterThanWithoutVersionAndWithoutRoadRunnerPackage(): void
+    {
+        $comparator = $this->createMock(ComparatorInterface::class);
+        $comparator
+            ->expects($this->never())
+            ->method('greaterThan');
+
+        $requiredVersion = $this->createMock(RequiredInterface::class);
+        $requiredVersion
+            ->expects($this->once())
+            ->method('getRequiredVersion')
+            ->willReturn(null);
+
+        $checker = new VersionChecker(
+            $this->createMock(InstalledInterface::class),
+            $requiredVersion,
+            $comparator
+        );
+
+        $this->expectException(RequiredVersionException::class);
+        $checker->greaterThan();
     }
 
     /**
