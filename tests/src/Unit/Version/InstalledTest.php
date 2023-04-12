@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace RoadRunner\VersionChecker\Tests\Unit;
+namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 
 use PHPUnit\Framework\TestCase;
+use RoadRunner\VersionChecker\Environment\EnvironmentInterface;
 use RoadRunner\VersionChecker\Exception\RoadrunnerNotInstalledException;
 use RoadRunner\VersionChecker\Process\ProcessInterface;
 use RoadRunner\VersionChecker\Version\Installed;
@@ -12,6 +13,12 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 final class InstalledTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        // clean the cache
+        (new \ReflectionProperty(Installed::class, 'cachedVersion'))->setValue(null);
+    }
+
     /**
      * @dataProvider outputDataProvider
      */
@@ -27,6 +34,63 @@ final class InstalledTest extends TestCase
         $installed = new Installed($process);
 
         $this->assertSame($version, $installed->getInstalledVersion());
+    }
+
+    public function testCachedVersion(): void
+    {
+        $env = $this->createMock(EnvironmentInterface::class);
+        $env
+            // $this->once() is important for this test!
+            ->expects($this->once())
+            ->method('get')
+            ->with('RR_VERSION')
+            ->willReturn('2023.1.0');
+
+        $installed = new Installed(environment: $env);
+
+        $version = $installed->getInstalledVersion();
+        $version2 = $installed->getInstalledVersion();
+
+        $this->assertSame('2023.1.0', $version);
+        $this->assertSame('2023.1.0', $version2);
+    }
+
+    public function getVersionFromEnv(): void
+    {
+        $env = $this->createMock(EnvironmentInterface::class);
+        $env
+            ->expects($this->once())
+            ->method('get')
+            ->with('RR_VERSION')
+            ->willReturn('2023.1.0');
+
+        $process = $this->createMock(ProcessInterface::class);
+        $process->expects($this->never());
+
+        $installed = new Installed($process, $env);
+
+        $this->assertSame('2023.1.0', $installed->getInstalledVersion());
+    }
+
+    public function getVersionFromConsoleCommand(): void
+    {
+        $env = $this->createMock(EnvironmentInterface::class);
+        $env
+            ->expects($this->once())
+            ->method('get')
+            ->with('RR_VERSION')
+            ->willReturn(null);
+
+        $process = $this->createMock(ProcessInterface::class);
+        $process
+            ->expects($this->once())
+            ->method('exec')
+            ->with(['./rr', '--version'])
+            ->willReturn('version 2023.1.0');
+
+        $installed = new Installed($process, $env);
+
+        $this->assertSame('2023.1.0', $installed->getInstalledVersion());
     }
 
     public function testGetInstalledVersionRoadRunnerIsNotInstalled(): void

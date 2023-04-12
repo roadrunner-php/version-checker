@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace RoadRunner\VersionChecker\Tests\Unit;
+namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 
 use PHPUnit\Framework\TestCase;
 use RoadRunner\VersionChecker\Version\Comparator;
