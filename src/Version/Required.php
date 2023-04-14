@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace RoadRunner\VersionChecker\Version;
 
 use Composer\Semver\Comparator as SemverComparator;
-use Composer\Semver\VersionParser;
 use RoadRunner\VersionChecker\Composer\Package;
 use RoadRunner\VersionChecker\Composer\PackageInterface;
 
 final class Required implements RequiredInterface
 {
     private const ROADRUNNER_PACKAGE = 'spiral/roadrunner';
+
+    /**
+     * @var non-empty-string|null
+     */
+    private static ?string $cachedVersion = null;
 
     public function __construct(
         private readonly PackageInterface $package = new Package()
@@ -23,16 +27,15 @@ final class Required implements RequiredInterface
      */
     public function getRequiredVersion(): ?string
     {
-        $parser = new VersionParser();
-
-        $version = null;
-        foreach ($this->package->getRequiredVersions(self::ROADRUNNER_PACKAGE) as $packageVersion) {
-            /** @var non-empty-string $packageVersion */
-            $packageVersion = $parser->normalize($packageVersion);
-            $version = $this->getMinimumVersion($packageVersion, $version);
+        if (self::$cachedVersion !== null) {
+            return self::$cachedVersion;
         }
 
-        return $version;
+        foreach ($this->package->getRequiredVersions(self::ROADRUNNER_PACKAGE) as $packageVersion) {
+            self::$cachedVersion = $this->getMinimumVersion($packageVersion, self::$cachedVersion);
+        }
+
+        return self::$cachedVersion;
     }
 
     /**

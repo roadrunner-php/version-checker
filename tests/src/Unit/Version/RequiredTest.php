@@ -5,10 +5,17 @@ declare(strict_types=1);
 namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 
 use PHPUnit\Framework\TestCase;
+use RoadRunner\VersionChecker\Composer\PackageInterface;
 use RoadRunner\VersionChecker\Version\Required;
 
 final class RequiredTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        // clean the cache
+        (new \ReflectionProperty(Required::class, 'cachedVersion'))->setValue(null);
+    }
+
     /**
      * @dataProvider versionsDataProvider
      */
@@ -18,6 +25,36 @@ final class RequiredTest extends TestCase
         $ref = new \ReflectionMethod($required, 'getMinimumVersion');
 
         $this->assertSame($expected, $ref->invoke($required, $version, $previous));
+    }
+
+    public function testGetRequiredVersion(): void
+    {
+        $package = $this->createMock(PackageInterface::class);
+        $package
+            ->expects($this->once())
+            ->method('getRequiredVersions')
+            ->with('spiral/roadrunner')
+            ->willReturn(['2.0', '1.0', '2.0.0.0-dev', '2.0.0-alpha']);
+
+        $required = new Required($package);
+
+        $this->assertSame('1.0', $required->getRequiredVersion());
+    }
+
+    public function testGetCachedVersion(): void
+    {
+        $package = $this->createMock(PackageInterface::class);
+        $package
+            // $this->once() is important for this test!
+            ->expects($this->once())
+            ->method('getRequiredVersions')
+            ->with('spiral/roadrunner')
+            ->willReturn(['1.0']);
+
+        $required = new Required($package);
+
+        $this->assertSame('1.0', $required->getRequiredVersion());
+        $this->assertSame('1.0', $required->getRequiredVersion());
     }
 
     public static function versionsDataProvider(): \Traversable
@@ -33,5 +70,8 @@ final class RequiredTest extends TestCase
         yield ['2.0.0', '1.0.0', '1.0.0'];
         yield ['1.0.0', '1.0.0-alpha', '1.0.0-alpha'];
         yield ['1.0.0', '1.0.0', '1.0.0'];
+
+        yield ['1.0.0.0', '1.1.0', '1.0.0.0'];
+        yield ['1.0.0.0-dev', '1.0.0.0', '1.0.0.0-dev'];
     }
 }
