@@ -16,11 +16,15 @@ use RoadRunner\VersionChecker\Version\RequiredInterface;
 
 final class VersionChecker
 {
-    public function __construct(
-        private readonly InstalledInterface $installedVersion = new Installed(),
-        private readonly RequiredInterface $requiredVersion = new Required(),
-        private readonly ComparatorInterface $comparator = new Comparator()
-    ) {
+    private InstalledInterface $installedVersion;
+    private RequiredInterface $requiredVersion;
+    private ComparatorInterface $comparator;
+
+    public function __construct($installedVersion = null, $requiredVersion = null, $comparator = null)
+    {
+        $this->installedVersion = $installedVersion ?? new Installed();
+        $this->requiredVersion = $requiredVersion ?? new Required();
+        $this->comparator = $comparator ?? new Comparator();
     }
 
     /**

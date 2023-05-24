@@ -20,14 +20,19 @@ final class Installed implements InstalledInterface
      */
     private static ?string $cachedVersion = null;
 
+    private ProcessInterface $process;
+    private EnvironmentInterface $environment;
+
     /**
      * @param non-empty-string $executablePath
      */
     public function __construct(
-        private readonly ProcessInterface $process = new Process(),
-        private readonly EnvironmentInterface $environment = new Native(),
-        private readonly string $executablePath = './rr'
+        $process = null,
+        $environment = null,
+        private string $executablePath = './rr'
     ) {
+        $this->process = $process ?? new Process();
+        $this->environment = $environment ?? new Native();
     }
 
     /**

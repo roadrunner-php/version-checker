@@ -12,7 +12,7 @@
 
 Make sure that your server is configured with following PHP version and extensions:
 
-- PHP 8.1+
+- PHP 8.0+
 
 ## Installation
 
