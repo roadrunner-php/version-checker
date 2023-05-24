@@ -34,7 +34,7 @@ final class Required implements RequiredInterface
         }
 
         foreach ($this->package->getRequiredVersions(self::ROADRUNNER_PACKAGE) as $packageVersion) {
-            self::$cachedVersion = $this->getMinimumVersion($packageVersion, self::$cachedVersion);
+            self::$cachedVersion = $this->getMaximumVersion($packageVersion, self::$cachedVersion);
         }
 
         return self::$cachedVersion;
@@ -45,12 +45,12 @@ final class Required implements RequiredInterface
      * @param non-empty-string|null $previous
      * @return non-empty-string
      */
-    private function getMinimumVersion(string $version, ?string $previous = null): string
+    private function getMaximumVersion(string $version, ?string $previous = null): string
     {
         if ($previous === null) {
             return $version;
         }
 
-        return SemverComparator::lessThan($version, $previous) ? $version : $previous;
+        return SemverComparator::greaterThan($version, $previous) ? $version : $previous;
     }
 }

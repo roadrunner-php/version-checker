@@ -21,10 +21,10 @@ final class RequiredTest extends TestCase
     /**
      * @dataProvider versionsDataProvider
      */
-    public function testGetMinimumVersion(string $version, ?string $previous, string $expected): void
+    public function testGetMaximumVersion(string $version, ?string $previous, string $expected): void
     {
         $required = new Required();
-        $ref = new \ReflectionMethod($required, 'getMinimumVersion');
+        $ref = new \ReflectionMethod($required, 'getMaximumVersion');
         $ref->setAccessible(true);
 
         $this->assertSame($expected, $ref->invoke($required, $version, $previous));
@@ -41,7 +41,7 @@ final class RequiredTest extends TestCase
 
         $required = new Required($package);
 
-        $this->assertSame('1.0', $required->getRequiredVersion());
+        $this->assertSame('2.0.0.0-dev', $required->getRequiredVersion());
     }
 
     public function testGetCachedVersion(): void
@@ -66,15 +66,15 @@ final class RequiredTest extends TestCase
         yield ['1.0.0', null, '1.0.0'];
 
         // Test case with $version < $previous
-        yield ['1.0.0', '2.0.0', '1.0.0'];
-        yield ['1.0.0-alpha', '1.0.0', '1.0.0-alpha'];
+        yield ['1.0.0', '2.0.0', '2.0.0'];
+        yield ['1.0.0-alpha', '1.0.0', '1.0.0'];
 
         // Test case with $version >= $previous
-        yield ['2.0.0', '1.0.0', '1.0.0'];
-        yield ['1.0.0', '1.0.0-alpha', '1.0.0-alpha'];
+        yield ['2.0.0', '1.0.0', '2.0.0'];
+        yield ['1.0.0', '1.0.0-alpha', '1.0.0'];
         yield ['1.0.0', '1.0.0', '1.0.0'];
 
-        yield ['1.0.0.0', '1.1.0', '1.0.0.0'];
-        yield ['1.0.0.0-dev', '1.0.0.0', '1.0.0.0-dev'];
+        yield ['1.0.0.0', '1.1.0', '1.1.0'];
+        yield ['1.0.0.0-dev', '1.0.0.0', '1.0.0.0'];
     }
 }
