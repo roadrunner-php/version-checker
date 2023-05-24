@@ -17,9 +17,11 @@ final class Required implements RequiredInterface
      */
     private static ?string $cachedVersion = null;
 
-    public function __construct(
-        private readonly PackageInterface $package = new Package()
-    ) {
+    private PackageInterface $package;
+
+    public function __construct(PackageInterface $package = null)
+    {
+        $this->package = $package ?? new Package();
     }
 
     /**

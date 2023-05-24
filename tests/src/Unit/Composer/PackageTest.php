@@ -16,6 +16,7 @@ final class PackageTest extends TestCase
     {
         $package = new Package();
         $ref = new \ReflectionMethod($package, 'isSupportedVersion');
+        $ref->setAccessible(true);
 
         $this->assertSame($expected, $ref->invoke($package, $version));
     }
@@ -27,6 +28,7 @@ final class PackageTest extends TestCase
     {
         $package = new Package();
         $ref = new \ReflectionMethod($package, 'getMinVersion');
+        $ref->setAccessible(true);
 
         $this->assertSame($expected, $ref->invoke($package, $version));
     }
