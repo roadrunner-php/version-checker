@@ -27,8 +27,8 @@ final class Installed implements InstalledInterface
      * @param non-empty-string $executablePath
      */
     public function __construct(
-        $process = null,
-        $environment = null,
+        ProcessInterface $process = null,
+        EnvironmentInterface $environment = null,
         private string $executablePath = './rr'
     ) {
         $this->process = $process ?? new Process();

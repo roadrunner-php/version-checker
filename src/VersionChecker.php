@@ -20,8 +20,11 @@ final class VersionChecker
     private RequiredInterface $requiredVersion;
     private ComparatorInterface $comparator;
 
-    public function __construct($installedVersion = null, $requiredVersion = null, $comparator = null)
-    {
+    public function __construct(
+        InstalledInterface $installedVersion = null,
+        RequiredInterface $requiredVersion = null,
+        ComparatorInterface $comparator = null
+    ) {
         $this->installedVersion = $installedVersion ?? new Installed();
         $this->requiredVersion = $requiredVersion ?? new Required();
         $this->comparator = $comparator ?? new Comparator();

@@ -19,7 +19,7 @@ final class Required implements RequiredInterface
 
     private PackageInterface $package;
 
-    public function __construct($package = null)
+    public function __construct(PackageInterface $package = null)
     {
         $this->package = $package ?? new Package();
     }
