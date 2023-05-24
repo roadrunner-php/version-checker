@@ -16,7 +16,9 @@ final class InstalledTest extends TestCase
     protected function tearDown(): void
     {
         // clean the cache
-        (new \ReflectionProperty(Installed::class, 'cachedVersion'))->setValue(null);
+        $ref = new \ReflectionProperty(Installed::class, 'cachedVersion');
+        $ref->setAccessible(true);
+        $ref->setValue(null);
     }
 
     /**

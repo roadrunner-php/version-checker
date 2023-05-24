@@ -13,7 +13,9 @@ final class RequiredTest extends TestCase
     protected function tearDown(): void
     {
         // clean the cache
-        (new \ReflectionProperty(Required::class, 'cachedVersion'))->setValue(null);
+        $ref = new \ReflectionProperty(Required::class, 'cachedVersion');
+        $ref->setAccessible(true);
+        $ref->setValue(null);
     }
 
     /**
@@ -23,6 +25,7 @@ final class RequiredTest extends TestCase
     {
         $required = new Required();
         $ref = new \ReflectionMethod($required, 'getMinimumVersion');
+        $ref->setAccessible(true);
 
         $this->assertSame($expected, $ref->invoke($required, $version, $previous));
     }
