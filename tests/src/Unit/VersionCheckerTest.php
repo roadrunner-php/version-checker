@@ -256,9 +256,34 @@ final class VersionCheckerTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider getFormattedMessageDataProvider
+     */
+    public function testGetFormattedMessage(string $version, string $expected): void
+    {
+        $checker = new VersionChecker();
+        $ref = new \ReflectionMethod($checker, 'getFormattedMessage');
+        $ref->setAccessible(true);
+
+        $this->assertSame(
+            \sprintf('installed 1 required %s', $expected),
+            $ref->invoke($checker, 'installed %s required %s', '1', $version)
+        );
+    }
+
     public static function invalidVersionsDataProvider(): \Traversable
     {
         yield [''];
         yield [null];
+    }
+
+    public static function getFormattedMessageDataProvider(): \Traversable
+    {
+        yield ['1', '1'];
+        yield ['1.1', '1.1'];
+        yield ['1.2.3', '1.2.3'];
+        yield ['1.2.3.4', '1.2.3'];
+        yield ['v1.2.3.4', '1.2.3'];
+        yield ['2023.1.0.0-dev', '2023.1.0'];
     }
 }

@@ -53,7 +53,7 @@ final class VersionChecker
         $installedVersion = $this->installedVersion->getInstalledVersion();
 
         if (!$this->comparator->greaterThan($version, $installedVersion)) {
-            throw new UnsupportedVersionException(\sprintf(
+            throw new UnsupportedVersionException($this->getFormattedMessage(
                 'Installed RoadRunner version `%s` not supported. Requires version `%s` or higher.',
                 $installedVersion,
                 $version
@@ -72,7 +72,7 @@ final class VersionChecker
         $installedVersion = $this->installedVersion->getInstalledVersion();
 
         if (!$this->comparator->lessThan($version, $installedVersion)) {
-            throw new UnsupportedVersionException(\sprintf(
+            throw new UnsupportedVersionException($this->getFormattedMessage(
                 'Installed RoadRunner version `%s` not supported. Requires version `%s` or lower.',
                 $installedVersion,
                 $version
@@ -91,11 +91,32 @@ final class VersionChecker
         $installedVersion = $this->installedVersion->getInstalledVersion();
 
         if (!$this->comparator->equal($version, $installedVersion)) {
-            throw new UnsupportedVersionException(\sprintf(
+            throw new UnsupportedVersionException($this->getFormattedMessage(
                 'Installed RoadRunner version `%s` not supported. Requires version `%s`.',
                 $installedVersion,
                 $version
             ), $installedVersion, $version);
         }
+    }
+
+    /**
+     * @param non-empty-string $message
+     * @param non-empty-string $installedVersion
+     * @param non-empty-string $version
+     *
+     * @return non-empty-string
+     */
+    private function getFormattedMessage(string $message, string $installedVersion, string $version): string
+    {
+        \preg_match('/\bv?(\d+)\.(\d+)\.(\d+)\b/', $version, $matches);
+
+        if (!empty($matches[0])) {
+            $version = $matches[1] . '.' . $matches[2] . '.' . $matches[3];
+        }
+
+        /** @var non-empty-string $msg */
+        $msg = \sprintf($message, $installedVersion, $version);
+
+        return $msg;
     }
 }
