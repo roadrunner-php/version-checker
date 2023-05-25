@@ -82,9 +82,9 @@ final class Installed implements InstalledInterface
             $output = $this->process->exec([$this->executablePath, '--version']);
         } catch (ProcessFailedException) {
             throw new RoadrunnerNotInstalledException(\sprintf(
-                'Roadrunner is not installed. Make sure' .
-                ' RoadRunner is installed and available here: `%s`. If RoadRunner is installed in a different path,' .
-                ' pass the correct `executablePath` parameter to the `%s` class constructor.',
+                'Roadrunner is not installed. Make sure RoadRunner is installed and available here: `%s`.' .
+                ' If RoadRunner is installed in a different path, pass the correct `executablePath` parameter to the' .
+                ' `%s` class constructor.',
                 $this->executablePath,
                 self::class
             ));
