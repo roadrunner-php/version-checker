@@ -56,6 +56,7 @@ final class ComparatorTest extends TestCase
         yield ['2.0.0-alpha', '2.0.0-beta', true];
         yield ['2.0.0-alpha', '2.0.0-alpha.1', true];
         yield ['2.0.0-alpha', '2.0.0-alpha', true];
+        yield ['2023.1.0.0-dev', '2023.1.0', true];
     }
 
     public static function lessThanDataProvider(): \Traversable
@@ -74,7 +75,8 @@ final class ComparatorTest extends TestCase
         yield ['2.0.0-alpha', '2.0.0', false];
         yield ['2.0.0-alpha', '2.0.0-beta', false];
         yield ['2.0.0-alpha', '2.0.0-alpha.1', false];
-        yield ['2.0.0-alpha', '2.0.0-alpha', true];
+        yield ['2023.1.0.0-dev', '2023.1.0', false];
+        yield ['2023.1.0', '2023.1.0.0-dev', true];
     }
 
     public static function equalDataProvider(): \Traversable
