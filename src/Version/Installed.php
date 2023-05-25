@@ -81,7 +81,13 @@ final class Installed implements InstalledInterface
         try {
             $output = $this->process->exec([$this->executablePath, '--version']);
         } catch (ProcessFailedException) {
-            throw new RoadrunnerNotInstalledException('Roadrunner is not installed.');
+            throw new RoadrunnerNotInstalledException(\sprintf(
+                'Roadrunner is not installed. Make sure RoadRunner is installed and available here: `%s`.' .
+                ' If RoadRunner is installed in a different path, pass the correct `executablePath` parameter to the' .
+                ' `%s` class constructor.',
+                $this->executablePath,
+                self::class
+            ));
         }
 
         \preg_match('/\bversion (\d+\.\d+\.\d+[\w.-]*)/', $output, $matches);
