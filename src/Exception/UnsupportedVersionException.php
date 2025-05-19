@@ -14,7 +14,7 @@ final class UnsupportedVersionException extends VersionCheckerException
     public function __construct(
         string $message,
         private string $installed,
-        private string $requested
+        private string $requested,
     ) {
         parent::__construct($message);
     }

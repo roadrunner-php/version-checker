@@ -27,9 +27,9 @@ final class Installed implements InstalledInterface
      * @param non-empty-string $executablePath
      */
     public function __construct(
-        ProcessInterface $process = null,
-        EnvironmentInterface $environment = null,
-        private string $executablePath = './rr'
+        ?ProcessInterface $process = null,
+        ?EnvironmentInterface $environment = null,
+        private string $executablePath = './rr',
     ) {
         $this->process = $process ?? new Process();
         $this->environment = $environment ?? new Native();
@@ -86,7 +86,7 @@ final class Installed implements InstalledInterface
                 ' If RoadRunner is installed in a different path, pass the correct `executablePath` parameter to the' .
                 ' `%s` class constructor.',
                 $this->executablePath,
-                self::class
+                self::class,
             ));
         }
 
