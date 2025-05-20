@@ -11,7 +11,7 @@ final class Comparator implements ComparatorInterface
 {
     private VersionParser $parser;
 
-    public function __construct(VersionParser $parser = null)
+    public function __construct(?VersionParser $parser = null)
     {
         $this->parser = $parser ?? new VersionParser();
     }
@@ -24,7 +24,7 @@ final class Comparator implements ComparatorInterface
     {
         return SemverComparator::greaterThanOrEqualTo(
             $this->parser->normalize($installed),
-            $this->parser->normalize($requested)
+            $this->parser->normalize($requested),
         );
     }
 
@@ -36,7 +36,7 @@ final class Comparator implements ComparatorInterface
     {
         return SemverComparator::lessThanOrEqualTo(
             $this->parser->normalize($installed),
-            $this->parser->normalize($requested)
+            $this->parser->normalize($requested),
         );
     }
 
@@ -48,7 +48,7 @@ final class Comparator implements ComparatorInterface
     {
         return SemverComparator::equalTo(
             $this->parser->normalize($installed),
-            $this->parser->normalize($requested)
+            $this->parser->normalize($requested),
         );
     }
 }

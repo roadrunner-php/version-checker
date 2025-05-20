@@ -21,9 +21,9 @@ final class VersionChecker
     private ComparatorInterface $comparator;
 
     public function __construct(
-        InstalledInterface $installedVersion = null,
-        RequiredInterface $requiredVersion = null,
-        ComparatorInterface $comparator = null
+        ?InstalledInterface $installedVersion = null,
+        ?RequiredInterface $requiredVersion = null,
+        ?ComparatorInterface $comparator = null,
     ) {
         $this->installedVersion = $installedVersion ?? new Installed();
         $this->requiredVersion = $requiredVersion ?? new Required();
@@ -46,7 +46,7 @@ final class VersionChecker
         if (empty($version)) {
             throw new RequiredVersionException(
                 'Unable to determine required RoadRunner version.' .
-                ' Please specify the required version in the `$version` parameter.'
+                ' Please specify the required version in the `$version` parameter.',
             );
         }
 
@@ -56,7 +56,7 @@ final class VersionChecker
             throw new UnsupportedVersionException($this->getFormattedMessage(
                 'Installed RoadRunner version `%s` not supported. Requires version `%s` or higher.',
                 $installedVersion,
-                $version
+                $version,
             ), $installedVersion, $version);
         }
     }
@@ -75,7 +75,7 @@ final class VersionChecker
             throw new UnsupportedVersionException($this->getFormattedMessage(
                 'Installed RoadRunner version `%s` not supported. Requires version `%s` or lower.',
                 $installedVersion,
-                $version
+                $version,
             ), $installedVersion, $version);
         }
     }
@@ -94,7 +94,7 @@ final class VersionChecker
             throw new UnsupportedVersionException($this->getFormattedMessage(
                 'Installed RoadRunner version `%s` not supported. Requires version `%s`.',
                 $installedVersion,
-                $version
+                $version,
             ), $installedVersion, $version);
         }
     }

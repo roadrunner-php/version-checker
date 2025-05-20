@@ -7,7 +7,7 @@ namespace RoadRunner\VersionChecker\Environment;
 final class Native implements EnvironmentInterface
 {
     public function __construct(
-        private array $values = []
+        private array $values = [],
     ) {
         $this->values = $values + $_ENV + $_SERVER;
     }
