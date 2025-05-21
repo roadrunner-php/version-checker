@@ -42,16 +42,18 @@ final class Installed implements InstalledInterface
      */
     public function getInstalledVersion(): string
     {
-        if (!empty(self::$cachedVersion)) {
+        if (self::$cachedVersion != null) {
             return self::$cachedVersion;
         }
 
-        if (!empty(self::$cachedVersion = $this->getVersionFromEnv())) {
-            return self::$cachedVersion;
+        $version = $this->getVersionFromEnv();
+        if ($version != null) {
+            return self::$cachedVersion = $version;
         }
 
-        if (!empty(self::$cachedVersion = $this->getVersionFromConsoleCommand())) {
-            return self::$cachedVersion;
+        $version = $this->getVersionFromConsoleCommand();
+        if ($version != null) {
+            return self::$cachedVersion = $version;
         }
 
         throw new RoadrunnerNotInstalledException('Unable to determine RoadRunner version.');

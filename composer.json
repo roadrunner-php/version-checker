@@ -9,15 +9,17 @@
     "homepage": "https://github.com/roadrunner-php/version-checker",
     "license": "MIT",
     "require": {
-        "php": "^8.0",
-        "symfony/process": "^5.4 || ^6.0 || ^7.0",
+        "php": "^8.1",
         "composer-runtime-api": "^2.0",
-        "composer/semver": "^3.3"
+        "composer/semver": "^3.3",
+        "symfony/process": "^5.4 || ^6.0 || ^7.0"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.8",
+        "phpcompatibility/php-compatibility": "^9.3",
         "phpunit/phpunit": "^9.6 || ^10.0",
-        "vimeo/psalm": "^5.9",
-        "friendsofphp/php-cs-fixer": "^3.8"
+        "spiral/code-style": "^2.2",
+        "vimeo/psalm": "^5.9"
     },
     "autoload": {
         "psr-4": {
@@ -32,7 +34,9 @@
     "scripts": {
         "test": "vendor/bin/phpunit",
         "psalm": "vendor/bin/psalm --config=psalm.xml ./src",
-        "cs": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php -vvv --dry-run --using-cache=no"
+        "cs": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php -vvv --dry-run --using-cache=no",
+        "cs:diff": "php-cs-fixer fix --dry-run -v --diff",
+        "cs:fix": "php-cs-fixer fix -v"
     },
     "config": {
         "sort-packages": true

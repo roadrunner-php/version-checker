@@ -2,19 +2,11 @@
 
 declare(strict_types=1);
 
-if (!file_exists(__DIR__.'/src')) {
-    exit(0);
-}
+use Spiral\CodeStyle\Builder;
 
-return (new PhpCsFixer\Config())
-    ->setRules([
-        '@PSR12' => true,
-        'ternary_operator_spaces' => false,
-    ])
-    ->setRiskyAllowed(true)
-    ->setFinder(
-        (new PhpCsFixer\Finder())
-            ->in(__DIR__.'/src')
-            ->append([__FILE__])
-    )
-    ->setCacheFile('.php-cs-fixer.cache');
+require_once 'vendor/autoload.php';
+
+return Builder::create()
+    ->include(__DIR__ . '/src')
+    ->include(__FILE__)
+    ->build();

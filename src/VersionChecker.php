@@ -39,11 +39,11 @@ final class VersionChecker
      */
     public function greaterThan(?string $version = null): void
     {
-        if (empty($version)) {
+        if ($version == null) {
             $version = $this->requiredVersion->getRequiredVersion();
         }
 
-        if (empty($version)) {
+        if ($version == null) {
             throw new RequiredVersionException(
                 'Unable to determine required RoadRunner version.' .
                 ' Please specify the required version in the `$version` parameter.',
@@ -110,7 +110,7 @@ final class VersionChecker
     {
         \preg_match('/\bv?(\d+)\.(\d+)\.(\d+)\b/', $version, $matches);
 
-        if (!empty($matches[0])) {
+        if (isset($matches[0]) && $matches[0] != null) {
             $version = $matches[1] . '.' . $matches[2] . '.' . $matches[3];
         }
 
