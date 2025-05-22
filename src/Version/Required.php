@@ -27,6 +27,7 @@ final class Required implements RequiredInterface
     /**
      * @return non-empty-string|null
      */
+    #[\Override]
     public function getRequiredVersion(): ?string
     {
         if (self::$cachedVersion !== null) {

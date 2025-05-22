@@ -40,6 +40,7 @@ final class Installed implements InstalledInterface
      *
      * @throws RoadrunnerNotInstalledException
      */
+    #[\Override]
     public function getInstalledVersion(): string
     {
         if (self::$cachedVersion != null) {
@@ -60,9 +61,9 @@ final class Installed implements InstalledInterface
     }
 
     /**
-     * @return non-empty-string|null
+     * @return null|string
      */
-    private function getVersionFromEnv(): ?string
+    private function getVersionFromEnv(): string|null
     {
         /** @var string|null $version */
         $version = $this->environment->get(self::ENV_VARIABLE);
@@ -75,10 +76,11 @@ final class Installed implements InstalledInterface
     }
 
     /**
-     * @return non-empty-string|null
+     * @return null|string
+     *
      * @throws RoadrunnerNotInstalledException
      */
-    private function getVersionFromConsoleCommand(): ?string
+    private function getVersionFromConsoleCommand(): string|null
     {
         try {
             $output = $this->process->exec([$this->executablePath, '--version']);

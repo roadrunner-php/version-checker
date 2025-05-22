@@ -1,22 +1,12 @@
-name: PHP-CS-Fixer Check
+on:
+    push:
+        branches:
+            - '*'
 
-on: [push, pull_request]
+name: Fix Code Style
 
 jobs:
-    phpcsfixer:
-        runs-on: ubuntu-latest
-
-        steps:
-            - uses: actions/checkout@v3
-
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: '8.1'
-
-            - name: Install dependencies
-              run: composer install --no-progress --no-suggest --prefer-dist
-
-            - name: Run PHP-CS-Fixer dry run
-              run: |
-                  vendor/bin/php-cs-fixer fix --dry-run -v --diff
+    cs-fix:
+        permissions:
+            contents: write
+        uses: spiral/gh-actions/.github/workflows/cs-fix.yml@master

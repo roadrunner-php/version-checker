@@ -114,7 +114,6 @@ final class VersionChecker
             $version = $matches[1] . '.' . $matches[2] . '.' . $matches[3];
         }
 
-        /** @var non-empty-string $msg */
         $msg = \sprintf($message, $installedVersion, $version);
 
         return $msg;

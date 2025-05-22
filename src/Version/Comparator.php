@@ -20,6 +20,7 @@ final class Comparator implements ComparatorInterface
      * @param non-empty-string $requested
      * @param non-empty-string $installed
      */
+    #[\Override]
     public function greaterThan(string $requested, string $installed): bool
     {
         return SemverComparator::greaterThanOrEqualTo(
@@ -32,6 +33,7 @@ final class Comparator implements ComparatorInterface
      * @param non-empty-string $requested
      * @param non-empty-string $installed
      */
+    #[\Override]
     public function lessThan(string $requested, string $installed): bool
     {
         return SemverComparator::lessThanOrEqualTo(
@@ -44,6 +46,7 @@ final class Comparator implements ComparatorInterface
      * @param non-empty-string $requested
      * @param non-empty-string $installed
      */
+    #[\Override]
     public function equal(string $requested, string $installed): bool
     {
         return SemverComparator::equalTo(

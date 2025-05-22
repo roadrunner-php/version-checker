@@ -18,20 +18,4 @@ final class UnsupportedVersionException extends VersionCheckerException
     ) {
         parent::__construct($message);
     }
-
-    /**
-     * @return non-empty-string
-     */
-    public function getInstalledVersion(): string
-    {
-        return $this->installed;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    public function getRequestedVersion(): string
-    {
-        return $this->requested;
-    }
 }

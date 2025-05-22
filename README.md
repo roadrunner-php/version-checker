@@ -8,12 +8,6 @@
 [![Total Downloads](https://poser.pugx.org/roadrunner-php/version-checker/downloads)](https://packagist.org/roadrunner-php/version-checker/phpunit)
 <a href="https://discord.gg/8bZsjYhVVk"><img src="https://img.shields.io/badge/discord-chat-magenta.svg"></a>
 
-## Requirements
-
-Make sure that your server is configured with following PHP version and extensions:
-
-- PHP 8.1+
-
 ## Installation
 
 You can install the package via composer:

@@ -6,7 +6,12 @@ use Spiral\CodeStyle\Builder;
 
 require_once 'vendor/autoload.php';
 
+
 return Builder::create()
     ->include(__DIR__ . '/src')
     ->include(__FILE__)
-    ->build();
+    ->build()->setRules([
+        'ordered_imports' => ['sort_algorithm' => 'alpha'],
+        'fully_qualified_strict_types' => true,
+        'no_unused_imports' => true,
+    ]);
