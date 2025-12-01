@@ -11,8 +11,12 @@ final class Package implements PackageInterface
 {
     /**
      * @param non-empty-string $packageName
-     * @return non-empty-string[]
+     *
+     * @return string[]
+     *
+     * @psalm-return list<non-empty-string>
      */
+    #[\Override]
     public function getRequiredVersions(string $packageName): array
     {
         $versions = [];
@@ -20,13 +24,21 @@ final class Package implements PackageInterface
             $path = InstalledVersions::getInstallPath($package);
             if ($path !== null && \file_exists($path . '/composer.json')) {
                 /** @var array{require?: array<non-empty-string, non-empty-string>} $composerJson */
-                $composerJson = \json_decode(\file_get_contents($path . '/composer.json'), true);
+                $fileContent = \file_get_contents($path . '/composer.json');
+                /** @var array<string, mixed>|null $composerJson */
+                $composerJson = $fileContent === false ? null : \json_decode($fileContent, true);
 
-                if (
-                    isset($composerJson['require'][$packageName]) &&
-                    $this->isSupportedVersion($composerJson['require'][$packageName])
-                ) {
-                    $versions[] = $this->getMinVersion($composerJson['require'][$packageName]);
+                if (isset($composerJson['require'][$packageName])) {
+                    /** @var mixed $rawPackage */
+                    $rawPackage = $composerJson['require'][$packageName];
+
+                    if (is_string($rawPackage) && strlen($rawPackage) > 0) {
+                        assert($rawPackage !== '');
+
+                        if ($this->isSupportedVersion($rawPackage)) {
+                            $versions[] = $this->getMinVersion($rawPackage);
+                        }
+                    }
                 }
             }
         }
