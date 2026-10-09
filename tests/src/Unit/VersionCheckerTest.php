@@ -7,6 +7,7 @@ namespace RoadRunner\VersionChecker\Tests\Unit;
 use Mockery;
 use RoadRunner\VersionChecker\Exception\RequiredVersionException;
 use RoadRunner\VersionChecker\Exception\UnsupportedVersionException;
+use RoadRunner\VersionChecker\Version\Comparator;
 use RoadRunner\VersionChecker\Version\ComparatorInterface;
 use RoadRunner\VersionChecker\Version\InstalledInterface;
 use RoadRunner\VersionChecker\Version\RequiredInterface;
@@ -117,6 +118,34 @@ final class VersionCheckerTest
         Assert::same($exception->getInstalledVersion(), '1.0');
         Assert::same($exception->getRequestedVersion(), '2.0');
         Assert::same($exception->getMessage(), 'Installed RoadRunner version `1.0` not supported. Requires version `2.0` or higher.');
+    }
+
+    public function testGreaterThanTreatsZeroAsVersion(): void
+    {
+        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('2.12.3');
+
+        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion->shouldReceive('getRequiredVersion')->never();
+
+        $checker = new VersionChecker($installedVersion, $requiredVersion, new Comparator());
+
+        $checker->greaterThan('0');
+    }
+
+    public function testFailGreaterThanReportsRequiredVersionWithoutStability(): void
+    {
+        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('2.12.3');
+
+        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion->shouldReceive('getRequiredVersion')->once()->andReturn('2023.1.0.0-dev');
+
+        $checker = new VersionChecker($installedVersion, $requiredVersion, new Comparator());
+
+        Expect::exception(UnsupportedVersionException::class)
+            ->withMessage('Installed RoadRunner version `2.12.3` not supported. Requires version `2023.1.0` or higher.');
+        $checker->greaterThan();
     }
 
     public function testSuccessLessThan(): void

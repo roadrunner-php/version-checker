@@ -6,12 +6,14 @@ namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 
 use Mockery;
 use RoadRunner\VersionChecker\Environment\EnvironmentInterface;
+use RoadRunner\VersionChecker\Environment\Native;
 use RoadRunner\VersionChecker\Exception\RoadrunnerNotInstalledException;
 use RoadRunner\VersionChecker\Process\ProcessInterface;
 use RoadRunner\VersionChecker\Version\Installed;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Testo\Assert;
 use Testo\Data\DataProvider;
+use Testo\Data\DataSet;
 use Testo\Expect;
 use Testo\Lifecycle\AfterTest;
 use Testo\Test;
@@ -54,7 +56,8 @@ final class InstalledTest
         Assert::same($version2, '2023.1.0');
     }
 
-    public function getVersionFromEnv(): void
+    #[Test]
+    public function testEnvironmentVersionTakesPrecedenceOverConsoleCommand(): void
     {
         $env = Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
         $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn('2023.1.0');
@@ -67,10 +70,13 @@ final class InstalledTest
         Assert::same($installed->getInstalledVersion(), '2023.1.0');
     }
 
-    public function getVersionFromConsoleCommand(): void
+    #[Test]
+    #[DataSet([null], 'not set')]
+    #[DataSet([''], 'empty string')]
+    public function testConsoleCommandIsUsedWithoutEnvironmentVersion(?string $envValue): void
     {
         $env = Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
-        $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn(null);
+        $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn($envValue);
 
         $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
         $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn('version 2023.1.0');
@@ -101,6 +107,27 @@ final class InstalledTest
         $installed = new Installed($process);
 
         Expect::exception(RoadrunnerNotInstalledException::class)->withMessageContaining('Unable to determine RoadRunner version.');
+        $installed->getInstalledVersion();
+    }
+
+    #[Test]
+    public function testConsoleCommandUsesExecutablePath(): void
+    {
+        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['/opt/bin/rr', '--version'], Mockery::andAnyOtherArgs())->andReturn('rr version 2024.3.0');
+
+        $installed = new Installed($process, new Native(['RR_VERSION' => '']), '/opt/bin/rr');
+
+        Assert::same($installed->getInstalledVersion(), '2024.3.0');
+    }
+
+    #[Test]
+    public function testMissingExecutableIsReportedAsNotInstalled(): void
+    {
+        $executable = \sys_get_temp_dir() . '/roadrunner-version-checker-missing/rr';
+        $installed = new Installed(environment: new Native(['RR_VERSION' => '']), executablePath: $executable);
+
+        Expect::exception(RoadrunnerNotInstalledException::class)->withMessageContaining($executable);
         $installed->getInstalledVersion();
     }
 

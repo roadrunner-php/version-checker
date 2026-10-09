@@ -44,6 +44,27 @@ final class RequiredTest
         Assert::same($required->getRequiredVersion(), '2.0.0.0-dev');
     }
 
+    #[DataProvider('releaseLinesDataProvider')]
+    public function testGetRequiredVersionPicksLatestReleaseLine(array $versions, string $expected): void
+    {
+        $package = Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
+        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner', Mockery::andAnyOtherArgs())->andReturn($versions);
+
+        $required = new Required($package);
+
+        Assert::same($required->getRequiredVersion(), $expected);
+    }
+
+    public function testGetRequiredVersionWithoutRoadRunnerRequirement(): void
+    {
+        $package = Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
+        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner', Mockery::andAnyOtherArgs())->andReturn([]);
+
+        $required = new Required($package);
+
+        Assert::null($required->getRequiredVersion());
+    }
+
     public function testGetCachedVersion(): void
     {
         $package = Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
@@ -53,6 +74,16 @@ final class RequiredTest
 
         Assert::same($required->getRequiredVersion(), '1.0');
         Assert::same($required->getRequiredVersion(), '1.0');
+    }
+
+    public static function releaseLinesDataProvider(): \Traversable
+    {
+        yield '2.x, calendar, 3.x' => [['2.12.0.0-dev', '2023.1.0.0-dev', '3.0.0.0-dev'], '3.0.0.0-dev'];
+        yield '3.x, calendar, 2.x' => [['3.0.0.0-dev', '2025.1.0.0-dev', '2.12.0.0-dev'], '3.0.0.0-dev'];
+        yield 'calendar first' => [['2025.1.0.0-dev', '3.0.0.0-dev', '2023.1.0.0-dev'], '3.0.0.0-dev'];
+        yield 'calendar only' => [['2024.1.0.0-dev', '2023.1.0.0-dev', '2025.1.0.0-dev'], '2025.1.0.0-dev'];
+        yield 'wildcard and 2.x' => [['0.0.0.0-dev', '2.12.0.0-dev'], '2.12.0.0-dev'];
+        yield 'pre-release and its release' => [['3.0.0.0-beta1', '3.0.0.0'], '3.0.0.0'];
     }
 
     public static function versionsDataProvider(): \Traversable

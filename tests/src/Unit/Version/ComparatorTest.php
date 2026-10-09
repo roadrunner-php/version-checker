@@ -7,6 +7,9 @@ namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 use RoadRunner\VersionChecker\Version\Comparator;
 use Testo\Assert;
 use Testo\Data\DataProvider;
+use Testo\Data\DataSet;
+use Testo\Expect;
+use Testo\Skip;
 use Testo\Test;
 
 #[Test]
@@ -64,6 +67,16 @@ final class ComparatorTest
         yield ['3.1.0', '3.0.0', false];
         yield ['3.0.0', '3.1.0', true];
         yield ['3.0.0-beta.1', '3.0.0', true];
+        // '0' is satisfied by any installed release
+        yield ['0', '2.12.3', true];
+        // a release candidate is older than its release
+        yield ['2023.1.0', '2023.1.0-rc.2', false];
+        yield ['2023.1.0-rc.2', '2023.1.0', true];
+        // the `v` prefix is ignored
+        yield ['v2023.1.0', '2023.1.0', true];
+        yield ['v3.0.0', '2025.1.5', false];
+        // a dev branch is older than any release
+        yield ['dev-master', '2.12.3', true];
     }
 
     public static function lessThanDataProvider(): \Traversable
@@ -89,6 +102,8 @@ final class ComparatorTest
         yield ['3.0', '2025.1.5', true];
         yield ['2023.1', '2.12.3', true];
         yield ['2.12', '2024.3.0', false];
+        yield ['v3.0.0', '2025.1.5', true];
+        yield ['2023.1.0', '2023.1.0-rc.2', true];
     }
 
     public static function equalDataProvider(): \Traversable
@@ -111,12 +126,34 @@ final class ComparatorTest
         yield ['2.0.0-alpha.1', '2.0.0-alpha.1', true];
         yield ['3.0.0', 'v3.0.0', true];
         yield ['2025.1.0', '3.0.0', false];
+        yield ['v2023.1.0', '2023.1.0', true];
+        yield ['3.0', '3.0.0', true];
+        yield ['2023.1.0-rc.2', '2023.1.0-RC2', true];
     }
 
     #[DataProvider('compareDataProvider')]
     public function testCompare(string $a, string $b, int $expected): void
     {
         Assert::same(Comparator::compare($a, $b), $expected);
+    }
+
+    #[Skip('Bug: compare() handles the `v` prefix only when picking the release line; within a line the raw strings go to composer/semver unnormalized')]
+    #[DataSet(['v3.0.1', '3.0.0', 1], 'v prefix, newer patch')]
+    #[DataSet(['v2023.1.0', '2023.1.0', 0], 'v prefix, same version')]
+    #[DataSet(['3.0', '3.0.0', 0], 'short form of the same version')]
+    public function testCompareAcceptsUnnormalizedVersions(string $a, string $b, int $expected): void
+    {
+        Assert::same(Comparator::compare($a, $b), $expected);
+    }
+
+    #[DataSet(['*'], 'wildcard')]
+    #[DataSet(['latest'], 'word')]
+    public function testRejectsNonVersionStrings(string $requested): void
+    {
+        $comparator = new Comparator();
+
+        Expect::exception(\UnexpectedValueException::class);
+        $comparator->greaterThan($requested, '3.0.0');
     }
 
     public static function compareDataProvider(): \Traversable
@@ -129,5 +166,6 @@ final class ComparatorTest
         yield ['2025.1.0.0', '2024.3.0.0', 1];
         yield ['3.0.1.0', '3.0.0.0', 1];
         yield ['dev-master', '3.0.0.0', -1];
+        yield ['3.0.0.0', 'dev-master', 1];
     }
 }

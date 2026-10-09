@@ -1,0 +1,6 @@
+{
+    "name": "fixture/branch",
+    "require": {
+        "fixture/roadrunner": "dev-master"
+    }
+}
