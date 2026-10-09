@@ -4,39 +4,36 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 
-use PHPUnit\Framework\TestCase;
 use RoadRunner\VersionChecker\Version\Comparator;
+use Testo\Assert;
+use Testo\Data\DataProvider;
+use Testo\Test;
 
-final class ComparatorTest extends TestCase
+#[Test]
+final class ComparatorTest
 {
-    /**
-     * @dataProvider greaterThanDataProvider
-     */
+    #[DataProvider('greaterThanDataProvider')]
     public function testGreaterThan(string $requested, string $installed, bool $expected): void
     {
         $comparator = new Comparator();
 
-        $this->assertSame($expected, $comparator->greaterThan($requested, $installed));
+        Assert::same($comparator->greaterThan($requested, $installed), $expected);
     }
 
-    /**
-     * @dataProvider lessThanDataProvider
-     */
+    #[DataProvider('lessThanDataProvider')]
     public function testLessThan(string $requested, string $installed, bool $expected): void
     {
         $comparator = new Comparator();
 
-        $this->assertSame($expected, $comparator->lessThan($requested, $installed));
+        Assert::same($comparator->lessThan($requested, $installed), $expected);
     }
 
-    /**
-     * @dataProvider equalDataProvider
-     */
+    #[DataProvider('equalDataProvider')]
     public function testEqual(string $requested, string $installed, bool $expected): void
     {
         $comparator = new Comparator();
 
-        $this->assertSame($expected, $comparator->equal($requested, $installed));
+        Assert::same($comparator->equal($requested, $installed), $expected);
     }
 
     public static function greaterThanDataProvider(): \Traversable
@@ -116,12 +113,10 @@ final class ComparatorTest extends TestCase
         yield ['2025.1.0', '3.0.0', false];
     }
 
-    /**
-     * @dataProvider compareDataProvider
-     */
+    #[DataProvider('compareDataProvider')]
     public function testCompare(string $a, string $b, int $expected): void
     {
-        $this->assertSame($expected, Comparator::compare($a, $b));
+        Assert::same(Comparator::compare($a, $b), $expected);
     }
 
     public static function compareDataProvider(): \Traversable

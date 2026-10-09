@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 
-use PHPUnit\Framework\TestCase;
+use Mockery;
 use RoadRunner\VersionChecker\Environment\EnvironmentInterface;
 use RoadRunner\VersionChecker\Exception\RoadrunnerNotInstalledException;
 use RoadRunner\VersionChecker\Process\ProcessInterface;
 use RoadRunner\VersionChecker\Version\Installed;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Testo\Assert;
+use Testo\Data\DataProvider;
+use Testo\Expect;
+use Testo\Lifecycle\AfterTest;
+use Testo\Test;
 
-final class InstalledTest extends TestCase
+final class InstalledTest
 {
+    #[AfterTest]
     protected function tearDown(): void
     {
         // clean the cache
@@ -21,110 +27,80 @@ final class InstalledTest extends TestCase
         $ref->setValue(null);
     }
 
-    /**
-     * @dataProvider outputDataProvider
-     */
+    #[Test]
+    #[DataProvider('outputDataProvider')]
     public function testGetInstalledVersion(string $version, string $output): void
     {
-        $process = $this->createMock(ProcessInterface::class);
-        $process
-            ->expects($this->once())
-            ->method('exec')
-            ->with(['./rr', '--version'])
-            ->willReturn($output);
+        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn($output);
 
         $installed = new Installed($process);
 
-        $this->assertSame($version, $installed->getInstalledVersion());
+        Assert::same($installed->getInstalledVersion(), $version);
     }
 
+    #[Test]
     public function testCachedVersion(): void
     {
-        $env = $this->createMock(EnvironmentInterface::class);
-        $env
-            // $this->once() is important for this test!
-            ->expects($this->once())
-            ->method('get')
-            ->with('RR_VERSION')
-            ->willReturn('2023.1.0');
+        $env = Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
+        $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn('2023.1.0');
 
         $installed = new Installed(environment: $env);
 
         $version = $installed->getInstalledVersion();
         $version2 = $installed->getInstalledVersion();
 
-        $this->assertSame('2023.1.0', $version);
-        $this->assertSame('2023.1.0', $version2);
+        Assert::same($version, '2023.1.0');
+        Assert::same($version2, '2023.1.0');
     }
 
     public function getVersionFromEnv(): void
     {
-        $env = $this->createMock(EnvironmentInterface::class);
-        $env
-            ->expects($this->once())
-            ->method('get')
-            ->with('RR_VERSION')
-            ->willReturn('2023.1.0');
+        $env = Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
+        $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn('2023.1.0');
 
-        $process = $this->createMock(ProcessInterface::class);
-        $process->expects($this->never());
+        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldNotReceive('exec');
 
         $installed = new Installed($process, $env);
 
-        $this->assertSame('2023.1.0', $installed->getInstalledVersion());
+        Assert::same($installed->getInstalledVersion(), '2023.1.0');
     }
 
     public function getVersionFromConsoleCommand(): void
     {
-        $env = $this->createMock(EnvironmentInterface::class);
-        $env
-            ->expects($this->once())
-            ->method('get')
-            ->with('RR_VERSION')
-            ->willReturn(null);
+        $env = Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
+        $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn(null);
 
-        $process = $this->createMock(ProcessInterface::class);
-        $process
-            ->expects($this->once())
-            ->method('exec')
-            ->with(['./rr', '--version'])
-            ->willReturn('version 2023.1.0');
+        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn('version 2023.1.0');
 
         $installed = new Installed($process, $env);
 
-        $this->assertSame('2023.1.0', $installed->getInstalledVersion());
+        Assert::same($installed->getInstalledVersion(), '2023.1.0');
     }
 
+    #[Test]
     public function testGetInstalledVersionRoadRunnerIsNotInstalled(): void
     {
-        $process = $this->createMock(ProcessInterface::class);
-        $process
-            ->expects($this->once())
-            ->method('exec')
-            ->with(['./rr', '--version'])
-            ->willThrowException(
-                (new \ReflectionClass(ProcessFailedException::class))->newInstanceWithoutConstructor()
-            );
+        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andThrow((new \ReflectionClass(ProcessFailedException::class))->newInstanceWithoutConstructor());
 
         $installed = new Installed($process);
 
-        $this->expectException(RoadrunnerNotInstalledException::class);
+        Expect::exception(RoadrunnerNotInstalledException::class);
         $installed->getInstalledVersion();
     }
 
+    #[Test]
     public function testGetInstalledVersionUnableToDetermineVersion(): void
     {
-        $process = $this->createMock(ProcessInterface::class);
-        $process
-            ->expects($this->once())
-            ->method('exec')
-            ->with(['./rr', '--version'])
-            ->willReturn('foo');
+        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn('foo');
 
         $installed = new Installed($process);
 
-        $this->expectException(RoadrunnerNotInstalledException::class);
-        $this->expectExceptionMessage('Unable to determine RoadRunner version.');
+        Expect::exception(RoadrunnerNotInstalledException::class)->withMessageContaining('Unable to determine RoadRunner version.');
         $installed->getInstalledVersion();
     }
 

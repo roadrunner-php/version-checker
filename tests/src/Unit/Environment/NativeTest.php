@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Tests\Unit\Environment;
 
-use PHPUnit\Framework\TestCase;
 use RoadRunner\VersionChecker\Environment\Native;
+use Testo\Assert;
+use Testo\Data\DataProvider;
+use Testo\Test;
 
-final class NativeTest extends TestCase
+#[Test]
+final class NativeTest
 {
-    /**
-     * @dataProvider valuesDataProvider
-     */
+    #[DataProvider('valuesDataProvider')]
     public function testGet(mixed $value, mixed $expected, string $key): void
     {
         $native = new Native([
@@ -20,7 +21,7 @@ final class NativeTest extends TestCase
             '3' => true,
         ]);
 
-        $this->assertSame($expected, $native->get($key));
+        Assert::same($native->get($key), $expected);
     }
 
 
