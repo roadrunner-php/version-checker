@@ -33,6 +33,9 @@ version. The VersionChecker class has three public methods:
 - **lessThan** - Checks if the installed version of RoadRunner is **less than or equal** to the specified version.
 - **equal** - Checks if the installed version of RoadRunner is **equal** to the specified version.
 
+Versions are compared in RoadRunner release order: `2.x` < `2023.x`, `2024.x`, `2025.x` < `3.x`.
+For example, `3.0.0` satisfies `greaterThan('2025.1')`, and `2025.1.5` does not satisfy `greaterThan('3.0')`.
+
 All three methods throw an `RoadRunner\VersionChecker\Exception\UnsupportedVersionException` if the installed version
 of RoadRunner does not meet the specified requirements. If RoadRunner is not installed, a
 `RoadRunner\VersionChecker\Exception\RoadrunnerNotInstalledException` is thrown.

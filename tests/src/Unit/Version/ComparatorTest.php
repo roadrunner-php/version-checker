@@ -57,6 +57,16 @@ final class ComparatorTest extends TestCase
         yield ['2.0.0-alpha', '2.0.0-alpha.1', true];
         yield ['2.0.0-alpha', '2.0.0-alpha', true];
         yield ['2023.1.0.0-dev', '2023.1.0', true];
+        // calendar versions are newer than 2.x and older than 3.x
+        yield ['2023.1', '3.0.0', true];
+        yield ['2025.1.5.0-dev', 'v3.0.0', true];
+        yield ['3.0.0.0-dev', '2025.1.5', false];
+        yield ['3.0', '2.12.3', false];
+        yield ['2023.1', '2.12.3', false];
+        yield ['2.12', '2024.3.0', true];
+        yield ['3.1.0', '3.0.0', false];
+        yield ['3.0.0', '3.1.0', true];
+        yield ['3.0.0-beta.1', '3.0.0', true];
     }
 
     public static function lessThanDataProvider(): \Traversable
@@ -77,6 +87,11 @@ final class ComparatorTest extends TestCase
         yield ['2.0.0-alpha', '2.0.0-alpha.1', false];
         yield ['2023.1.0.0-dev', '2023.1.0', false];
         yield ['2023.1.0', '2023.1.0.0-dev', true];
+        // calendar versions are newer than 2.x and older than 3.x
+        yield ['2025.1', '3.0.0', false];
+        yield ['3.0', '2025.1.5', true];
+        yield ['2023.1', '2.12.3', true];
+        yield ['2.12', '2024.3.0', false];
     }
 
     public static function equalDataProvider(): \Traversable
@@ -97,5 +112,27 @@ final class ComparatorTest extends TestCase
         yield ['2.0.0-alpha', '2.0.0-alpha.1', false];
         yield ['2.0.0-alpha', '2.0.0-alpha', true];
         yield ['2.0.0-alpha.1', '2.0.0-alpha.1', true];
+        yield ['3.0.0', 'v3.0.0', true];
+        yield ['2025.1.0', '3.0.0', false];
+    }
+
+    /**
+     * @dataProvider compareDataProvider
+     */
+    public function testCompare(string $a, string $b, int $expected): void
+    {
+        $this->assertSame($expected, Comparator::compare($a, $b));
+    }
+
+    public static function compareDataProvider(): \Traversable
+    {
+        yield ['3.0.0.0', '3.0.0.0', 0];
+        yield ['3.0.0.0', '2025.1.5.0', 1];
+        yield ['2025.1.5.0', '3.0.0.0', -1];
+        yield ['2023.1.0.0-dev', '2.12.3.0', 1];
+        yield ['2.12.3.0', '3.0.0.0-dev', -1];
+        yield ['2025.1.0.0', '2024.3.0.0', 1];
+        yield ['3.0.1.0', '3.0.0.0', 1];
+        yield ['dev-master', '3.0.0.0', -1];
     }
 }

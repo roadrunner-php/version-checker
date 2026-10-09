@@ -76,5 +76,10 @@ final class RequiredTest extends TestCase
 
         yield ['1.0.0.0', '1.1.0', '1.1.0'];
         yield ['1.0.0.0-dev', '1.0.0.0', '1.0.0.0'];
+
+        // calendar versions are older than 3.x
+        yield ['3.0.0.0-dev', '2025.1.5.0-dev', '3.0.0.0-dev'];
+        yield ['2023.1.0.0-dev', '3.0.0.0-dev', '3.0.0.0-dev'];
+        yield ['2023.1.0.0-dev', '2.12.0.0-dev', '2023.1.0.0-dev'];
     }
 }
