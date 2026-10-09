@@ -41,7 +41,7 @@ final class RequiredTest
 
         $required = new Required($package);
 
-        Assert::same($required->getRequiredVersion(), '2.0.0.0-dev');
+        Assert::same($required->getRequiredVersion(), '2.0');
     }
 
     #[DataProvider('releaseLinesDataProvider')]

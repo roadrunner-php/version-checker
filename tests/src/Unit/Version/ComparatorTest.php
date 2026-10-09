@@ -9,7 +9,6 @@ use Testo\Assert;
 use Testo\Data\DataProvider;
 use Testo\Data\DataSet;
 use Testo\Expect;
-use Testo\Skip;
 use Testo\Test;
 
 #[Test]
@@ -137,7 +136,6 @@ final class ComparatorTest
         Assert::same(Comparator::compare($a, $b), $expected);
     }
 
-    #[Skip('Bug: compare() handles the `v` prefix only when picking the release line; within a line the raw strings go to composer/semver unnormalized')]
     #[DataSet(['v3.0.1', '3.0.0', 1], 'v prefix, newer patch')]
     #[DataSet(['v2023.1.0', '2023.1.0', 0], 'v prefix, same version')]
     #[DataSet(['3.0', '3.0.0', 0], 'short form of the same version')]
