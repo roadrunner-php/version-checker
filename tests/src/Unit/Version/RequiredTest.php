@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 
-use PHPUnit\Framework\TestCase;
+use Mockery;
 use RoadRunner\VersionChecker\Composer\PackageInterface;
 use RoadRunner\VersionChecker\Version\Required;
+use Testo\Assert;
+use Testo\Data\DataProvider;
+use Testo\Lifecycle\AfterTest;
+use Testo\Test;
 
-final class RequiredTest extends TestCase
+#[Test]
+final class RequiredTest
 {
+    #[AfterTest]
     protected function tearDown(): void
     {
         // clean the cache
@@ -18,46 +24,35 @@ final class RequiredTest extends TestCase
         $ref->setValue(null);
     }
 
-    /**
-     * @dataProvider versionsDataProvider
-     */
+    #[DataProvider('versionsDataProvider')]
     public function testGetMaximumVersion(string $version, ?string $previous, string $expected): void
     {
         $required = new Required();
         $ref = new \ReflectionMethod($required, 'getMaximumVersion');
         $ref->setAccessible(true);
 
-        $this->assertSame($expected, $ref->invoke($required, $version, $previous));
+        Assert::same($ref->invoke($required, $version, $previous), $expected);
     }
 
     public function testGetRequiredVersion(): void
     {
-        $package = $this->createMock(PackageInterface::class);
-        $package
-            ->expects($this->once())
-            ->method('getRequiredVersions')
-            ->with('spiral/roadrunner')
-            ->willReturn(['2.0', '1.0', '2.0.0.0-dev', '2.0.0-alpha']);
+        $package = Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
+        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner', Mockery::andAnyOtherArgs())->andReturn(['2.0', '1.0', '2.0.0.0-dev', '2.0.0-alpha']);
 
         $required = new Required($package);
 
-        $this->assertSame('2.0.0.0-dev', $required->getRequiredVersion());
+        Assert::same($required->getRequiredVersion(), '2.0.0.0-dev');
     }
 
     public function testGetCachedVersion(): void
     {
-        $package = $this->createMock(PackageInterface::class);
-        $package
-            // $this->once() is important for this test!
-            ->expects($this->once())
-            ->method('getRequiredVersions')
-            ->with('spiral/roadrunner')
-            ->willReturn(['1.0']);
+        $package = Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
+        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner', Mockery::andAnyOtherArgs())->andReturn(['1.0']);
 
         $required = new Required($package);
 
-        $this->assertSame('1.0', $required->getRequiredVersion());
-        $this->assertSame('1.0', $required->getRequiredVersion());
+        Assert::same($required->getRequiredVersion(), '1.0');
+        Assert::same($required->getRequiredVersion(), '1.0');
     }
 
     public static function versionsDataProvider(): \Traversable

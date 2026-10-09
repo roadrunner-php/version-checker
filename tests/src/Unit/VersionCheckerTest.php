@@ -4,35 +4,32 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Mockery;
 use RoadRunner\VersionChecker\Exception\RequiredVersionException;
 use RoadRunner\VersionChecker\Exception\UnsupportedVersionException;
 use RoadRunner\VersionChecker\Version\ComparatorInterface;
 use RoadRunner\VersionChecker\Version\InstalledInterface;
 use RoadRunner\VersionChecker\Version\RequiredInterface;
 use RoadRunner\VersionChecker\VersionChecker;
+use Testo\Assert;
+use Testo\Data\DataProvider;
+use Testo\Expect;
+use Testo\Test;
 
-final class VersionCheckerTest extends TestCase
+#[Test]
+final class VersionCheckerTest
 {
-    /**
-     * @dataProvider invalidVersionsDataProvider
-     */
+    #[DataProvider('invalidVersionsDataProvider')]
     public function testSuccessGreaterThanWithoutVersion(?string $version = null): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->once())
-            ->method('greaterThan')
-            ->willReturn(true);
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('greaterThan')->once()->andReturn(true);
 
-        $requiredVersion = $this->createMock(RequiredInterface::class);
-        $requiredVersion
-            ->expects($this->once())
-            ->method('getRequiredVersion')
-            ->willReturn('1.0');
+        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion->shouldReceive('getRequiredVersion')->once()->andReturn('1.0');
 
         $checker = new VersionChecker(
-            $this->createMock(InstalledInterface::class),
+            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
             $requiredVersion,
             $comparator
         );
@@ -42,19 +39,14 @@ final class VersionCheckerTest extends TestCase
 
     public function testSuccessGreaterThanWithVersion(): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->once())
-            ->method('greaterThan')
-            ->willReturn(true);
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('greaterThan')->once()->andReturn(true);
 
-        $requiredVersion = $this->createMock(RequiredInterface::class);
-        $requiredVersion
-            ->expects($this->never())
-            ->method('getRequiredVersion');
+        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion->shouldReceive('getRequiredVersion')->never();
 
         $checker = new VersionChecker(
-            $this->createMock(InstalledInterface::class),
+            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
             $requiredVersion,
             $comparator
         );
@@ -64,48 +56,33 @@ final class VersionCheckerTest extends TestCase
 
     public function testGreaterThanWithoutVersionAndWithoutRoadRunnerPackage(): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->never())
-            ->method('greaterThan');
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('greaterThan')->never();
 
-        $requiredVersion = $this->createMock(RequiredInterface::class);
-        $requiredVersion
-            ->expects($this->once())
-            ->method('getRequiredVersion')
-            ->willReturn(null);
+        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion->shouldReceive('getRequiredVersion')->once()->andReturn(null);
 
         $checker = new VersionChecker(
-            $this->createMock(InstalledInterface::class),
+            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
             $requiredVersion,
             $comparator
         );
 
-        $this->expectException(RequiredVersionException::class);
+        Expect::exception(RequiredVersionException::class);
         $checker->greaterThan();
     }
 
-    /**
-     * @dataProvider invalidVersionsDataProvider
-     */
+    #[DataProvider('invalidVersionsDataProvider')]
     public function testFailGreaterThanWithoutVersion(?string $version = null): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->once())
-            ->method('greaterThan')
-            ->willReturn(false);
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('greaterThan')->once()->andReturn(false);
 
-        $installedVersion = $this->createMock(InstalledInterface::class);
-        $installedVersion
-            ->expects($this->once())
-            ->method('getInstalledVersion')
-            ->willReturn('1.0');
+        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('1.0');
 
-        $requiredVersion = $this->createMock(RequiredInterface::class);
-        $requiredVersion
-            ->method('getRequiredVersion')
-            ->willReturn('2023.1');
+        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion->shouldReceive('getRequiredVersion')->andReturn('2023.1');
 
         $checker = new VersionChecker($installedVersion, $requiredVersion, $comparator);
 
@@ -114,32 +91,21 @@ final class VersionCheckerTest extends TestCase
         } catch (UnsupportedVersionException $exception) {
         }
 
-        $this->assertSame('1.0', $exception->getInstalledVersion());
-        $this->assertSame('2023.1', $exception->getRequestedVersion());
-        $this->assertSame(
-            'Installed RoadRunner version `1.0` not supported. Requires version `2023.1` or higher.',
-            $exception->getMessage()
-        );
+        Assert::same($exception->getInstalledVersion(), '1.0');
+        Assert::same($exception->getRequestedVersion(), '2023.1');
+        Assert::same($exception->getMessage(), 'Installed RoadRunner version `1.0` not supported. Requires version `2023.1` or higher.');
     }
 
     public function testFailGreaterThanWithVersion(): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->once())
-            ->method('greaterThan')
-            ->willReturn(false);
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('greaterThan')->once()->andReturn(false);
 
-        $installedVersion = $this->createMock(InstalledInterface::class);
-        $installedVersion
-            ->expects($this->once())
-            ->method('getInstalledVersion')
-            ->willReturn('1.0');
+        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('1.0');
 
-        $requiredVersion = $this->createMock(RequiredInterface::class);
-        $requiredVersion
-            ->expects($this->never())
-            ->method('getRequiredVersion');
+        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion->shouldReceive('getRequiredVersion')->never();
 
         $checker = new VersionChecker($installedVersion, $requiredVersion, $comparator);
 
@@ -148,25 +114,19 @@ final class VersionCheckerTest extends TestCase
         } catch (UnsupportedVersionException $exception) {
         }
 
-        $this->assertSame('1.0', $exception->getInstalledVersion());
-        $this->assertSame('2.0', $exception->getRequestedVersion());
-        $this->assertSame(
-            'Installed RoadRunner version `1.0` not supported. Requires version `2.0` or higher.',
-            $exception->getMessage()
-        );
+        Assert::same($exception->getInstalledVersion(), '1.0');
+        Assert::same($exception->getRequestedVersion(), '2.0');
+        Assert::same($exception->getMessage(), 'Installed RoadRunner version `1.0` not supported. Requires version `2.0` or higher.');
     }
 
     public function testSuccessLessThan(): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->once())
-            ->method('lessThan')
-            ->willReturn(true);
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('lessThan')->once()->andReturn(true);
 
         $checker = new VersionChecker(
-            $this->createMock(InstalledInterface::class),
-            $this->createMock(RequiredInterface::class),
+            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
+            Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
             $comparator
         );
 
@@ -175,21 +135,15 @@ final class VersionCheckerTest extends TestCase
 
     public function testFailLessThan(): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->once())
-            ->method('lessThan')
-            ->willReturn(false);
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('lessThan')->once()->andReturn(false);
 
-        $installedVersion = $this->createMock(InstalledInterface::class);
-        $installedVersion
-            ->expects($this->once())
-            ->method('getInstalledVersion')
-            ->willReturn('2.0');
+        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('2.0');
 
         $checker = new VersionChecker(
             $installedVersion,
-            $this->createMock(RequiredInterface::class),
+            Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
             $comparator
         );
 
@@ -198,25 +152,19 @@ final class VersionCheckerTest extends TestCase
         } catch (UnsupportedVersionException $exception) {
         }
 
-        $this->assertSame('2.0', $exception->getInstalledVersion());
-        $this->assertSame('1.0', $exception->getRequestedVersion());
-        $this->assertSame(
-            'Installed RoadRunner version `2.0` not supported. Requires version `1.0` or lower.',
-            $exception->getMessage()
-        );
+        Assert::same($exception->getInstalledVersion(), '2.0');
+        Assert::same($exception->getRequestedVersion(), '1.0');
+        Assert::same($exception->getMessage(), 'Installed RoadRunner version `2.0` not supported. Requires version `1.0` or lower.');
     }
 
     public function testSuccessEqual(): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->once())
-            ->method('equal')
-            ->willReturn(true);
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('equal')->once()->andReturn(true);
 
         $checker = new VersionChecker(
-            $this->createMock(InstalledInterface::class),
-            $this->createMock(RequiredInterface::class),
+            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
+            Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
             $comparator
         );
 
@@ -225,21 +173,15 @@ final class VersionCheckerTest extends TestCase
 
     public function testFailEqual(): void
     {
-        $comparator = $this->createMock(ComparatorInterface::class);
-        $comparator
-            ->expects($this->once())
-            ->method('equal')
-            ->willReturn(false);
+        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator->shouldReceive('equal')->once()->andReturn(false);
 
-        $installedVersion = $this->createMock(InstalledInterface::class);
-        $installedVersion
-            ->expects($this->once())
-            ->method('getInstalledVersion')
-            ->willReturn('2.0');
+        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('2.0');
 
         $checker = new VersionChecker(
             $installedVersion,
-            $this->createMock(RequiredInterface::class),
+            Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
             $comparator
         );
 
@@ -248,27 +190,19 @@ final class VersionCheckerTest extends TestCase
         } catch (UnsupportedVersionException $exception) {
         }
 
-        $this->assertSame('2.0', $exception->getInstalledVersion());
-        $this->assertSame('1.0', $exception->getRequestedVersion());
-        $this->assertSame(
-            'Installed RoadRunner version `2.0` not supported. Requires version `1.0`.',
-            $exception->getMessage()
-        );
+        Assert::same($exception->getInstalledVersion(), '2.0');
+        Assert::same($exception->getRequestedVersion(), '1.0');
+        Assert::same($exception->getMessage(), 'Installed RoadRunner version `2.0` not supported. Requires version `1.0`.');
     }
 
-    /**
-     * @dataProvider getFormattedMessageDataProvider
-     */
+    #[DataProvider('getFormattedMessageDataProvider')]
     public function testGetFormattedMessage(string $version, string $expected): void
     {
         $checker = new VersionChecker();
         $ref = new \ReflectionMethod($checker, 'getFormattedMessage');
         $ref->setAccessible(true);
 
-        $this->assertSame(
-            \sprintf('installed 1 required %s', $expected),
-            $ref->invoke($checker, 'installed %s required %s', '1', $version)
-        );
+        Assert::same($ref->invoke($checker, 'installed %s required %s', '1', $version), \sprintf('installed 1 required %s', $expected));
     }
 
     public static function invalidVersionsDataProvider(): \Traversable

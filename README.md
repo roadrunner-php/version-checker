@@ -2,7 +2,7 @@
 
 [![PHP Version Require](https://poser.pugx.org/roadrunner-php/version-checker/require/php)](https://packagist.org/packages/roadrunner-php/version-checker)
 [![Latest Stable Version](https://poser.pugx.org/roadrunner-php/version-checker/v/stable)](https://packagist.org/packages/roadrunner-php/version-checker)
-[![phpunit](https://github.com/roadrunner-php/version-checker/actions/workflows/phpunit.yml/badge.svg)](https://github.com/roadrunner-php/version-checker/actions)
+[![testo](https://github.com/roadrunner-php/version-checker/actions/workflows/testo.yml/badge.svg)](https://github.com/roadrunner-php/version-checker/actions)
 [![psalm](https://github.com/roadrunner-php/version-checker/actions/workflows/psalm.yml/badge.svg)](https://github.com/roadrunner-php/version-checker/actions)
 [![Codecov](https://codecov.io/gh/roadrunner-php/version-checker/branch/master/graph/badge.svg)](https://codecov.io/gh/roadrunner-php/version-checker)
 [![Total Downloads](https://poser.pugx.org/roadrunner-php/version-checker/downloads)](https://packagist.org/roadrunner-php/version-checker/phpunit)

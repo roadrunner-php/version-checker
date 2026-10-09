@@ -4,33 +4,32 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Tests\Unit\Composer;
 
-use PHPUnit\Framework\TestCase;
 use RoadRunner\VersionChecker\Composer\Package;
+use Testo\Assert;
+use Testo\Data\DataProvider;
+use Testo\Test;
 
-final class PackageTest extends TestCase
+#[Test]
+final class PackageTest
 {
-    /**
-     * @dataProvider isSupportedVersionDataProvider
-     */
+    #[DataProvider('isSupportedVersionDataProvider')]
     public function testIsSupportedVersion(string $version, bool $expected): void
     {
         $package = new Package();
         $ref = new \ReflectionMethod($package, 'isSupportedVersion');
         $ref->setAccessible(true);
 
-        $this->assertSame($expected, $ref->invoke($package, $version));
+        Assert::same($ref->invoke($package, $version), $expected);
     }
 
-    /**
-     * @dataProvider getMinVersionDataProvider
-     */
+    #[DataProvider('getMinVersionDataProvider')]
     public function testGetMinVersion(string $version, string $expected): void
     {
         $package = new Package();
         $ref = new \ReflectionMethod($package, 'getMinVersion');
         $ref->setAccessible(true);
 
-        $this->assertSame($expected, $ref->invoke($package, $version));
+        Assert::same($ref->invoke($package, $version), $expected);
     }
 
     public static function isSupportedVersionDataProvider(): \Traversable
