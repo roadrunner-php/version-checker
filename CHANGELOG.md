@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/roadrunner-php/version-checker/compare/v1.3.0...v1.3.1) (2026-10-09)
+
+
+### Documentation
+
+* refresh README header, badges and examples ([#25](https://github.com/roadrunner-php/version-checker/issues/25)) ([e354cfb](https://github.com/roadrunner-php/version-checker/commit/e354cfb6937ae01538a2fb389712aa0008dabeb6))
+
 ## [1.3.0](https://github.com/roadrunner-php/version-checker/compare/v1.2.0...v1.3.0) (2026-10-09)
 
 
