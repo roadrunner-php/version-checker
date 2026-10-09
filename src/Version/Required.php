@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Version;
 
-use Composer\Semver\Comparator as SemverComparator;
 use RoadRunner\VersionChecker\Composer\Package;
 use RoadRunner\VersionChecker\Composer\PackageInterface;
 
@@ -51,6 +50,6 @@ final class Required implements RequiredInterface
             return $version;
         }
 
-        return SemverComparator::greaterThan($version, $previous) ? $version : $previous;
+        return Comparator::compare($version, $previous) > 0 ? $version : $previous;
     }
 }
