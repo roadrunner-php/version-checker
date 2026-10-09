@@ -1,0 +1,6 @@
+{
+    "name": "fixture/invalid",
+    "require": {
+        "fixture/roadrunner": "latest"
+    }
+}

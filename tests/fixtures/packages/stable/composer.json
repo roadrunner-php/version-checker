@@ -1,0 +1,6 @@
+{
+    "name": "fixture/stable",
+    "require": {
+        "fixture/roadrunner": "^2.12"
+    }
+}
