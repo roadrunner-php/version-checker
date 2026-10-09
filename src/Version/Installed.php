@@ -40,17 +40,18 @@ final class Installed implements InstalledInterface
      *
      * @throws RoadrunnerNotInstalledException
      */
+    #[\Override]
     public function getInstalledVersion(): string
     {
-        if (!empty(self::$cachedVersion)) {
+        if (self::$cachedVersion !== null) {
             return self::$cachedVersion;
         }
 
-        if (!empty(self::$cachedVersion = $this->getVersionFromEnv())) {
+        if ((self::$cachedVersion = $this->getVersionFromEnv()) !== null) {
             return self::$cachedVersion;
         }
 
-        if (!empty(self::$cachedVersion = $this->getVersionFromConsoleCommand())) {
+        if ((self::$cachedVersion = $this->getVersionFromConsoleCommand()) !== null) {
             return self::$cachedVersion;
         }
 

@@ -47,6 +47,7 @@ final class Comparator implements ComparatorInterface
      * @param non-empty-string $requested
      * @param non-empty-string $installed
      */
+    #[\Override]
     public function greaterThan(string $requested, string $installed): bool
     {
         return self::compare($this->parser->normalize($installed), $this->parser->normalize($requested)) >= 0;
@@ -56,6 +57,7 @@ final class Comparator implements ComparatorInterface
      * @param non-empty-string $requested
      * @param non-empty-string $installed
      */
+    #[\Override]
     public function lessThan(string $requested, string $installed): bool
     {
         return self::compare($this->parser->normalize($installed), $this->parser->normalize($requested)) <= 0;
@@ -65,6 +67,7 @@ final class Comparator implements ComparatorInterface
      * @param non-empty-string $requested
      * @param non-empty-string $installed
      */
+    #[\Override]
     public function equal(string $requested, string $installed): bool
     {
         return self::compare($this->parser->normalize($installed), $this->parser->normalize($requested)) === 0;

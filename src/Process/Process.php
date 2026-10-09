@@ -8,6 +8,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 final class Process implements ProcessInterface
 {
+    #[\Override]
     public function exec(array $command): string
     {
         $process = new \Symfony\Component\Process\Process($command);
