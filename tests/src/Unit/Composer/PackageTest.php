@@ -8,8 +8,8 @@ use Composer\InstalledVersions;
 use RoadRunner\VersionChecker\Composer\Package;
 use Testo\Assert;
 use Testo\Data\DataProvider;
+use Testo\Data\DataSet;
 use Testo\Lifecycle\AfterTest;
-use Testo\Skip;
 use Testo\Test;
 
 #[Test]
@@ -72,14 +72,17 @@ final class PackageTest
         Assert::same($ref->invoke($package, $version), $expected);
     }
 
-    #[Skip('Bug: the lower bound comes from numeric semver order, where 3.0 < 2023.1, not from RoadRunner release order')]
-    public function testGetMinVersionFollowsReleaseOrderAcrossReleaseLines(): void
+    #[DataSet(['^2025.1 || ^3.0', '2025.1.0.0-dev'], 'calendar or 3.x')]
+    #[DataSet(['^3.0 || ^2025.1', '2025.1.0.0-dev'], '3.x or calendar')]
+    #[DataSet(['^3.0 || ^2024.1 || ^2.12', '2.12.0.0-dev'], 'all release lines')]
+    #[DataSet(['>=2025.1 <2026.0 || >=3.0', '2025.1.0.0-dev'], 'explicit ranges')]
+    public function testGetMinVersionFollowsReleaseOrderAcrossReleaseLines(string $version, string $expected): void
     {
         $package = new Package();
         $ref = new \ReflectionMethod($package, 'getMinVersion');
         $ref->setAccessible(true);
 
-        Assert::same($ref->invoke($package, '^2025.1 || ^3.0'), '2025.1.0.0-dev');
+        Assert::same($ref->invoke($package, $version), $expected);
     }
 
     public static function isSupportedVersionDataProvider(): \Traversable

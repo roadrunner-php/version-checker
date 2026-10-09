@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace RoadRunner\VersionChecker\Composer;
 
 use Composer\InstalledVersions;
+use Composer\Semver\Constraint\ConstraintInterface;
+use Composer\Semver\Constraint\MultiConstraint;
 use Composer\Semver\VersionParser;
+use RoadRunner\VersionChecker\Version\Comparator;
 
 final class Package implements PackageInterface
 {
@@ -65,11 +68,30 @@ final class Package implements PackageInterface
     {
         $parser = new VersionParser();
 
-        $constraint = $parser->parseConstraints($version);
-
         /** @var non-empty-string $min */
-        $min = $constraint->getLowerBound()->getVersion();
+        $min = $this->getLowerBound($parser->parseConstraints($version));
 
         return $min;
+    }
+
+    /**
+     * Composer orders `3.0` below `2023.1`, so the lowest alternative of an `||` constraint
+     * is picked in RoadRunner release order instead.
+     */
+    private function getLowerBound(ConstraintInterface $constraint): string
+    {
+        if (!$constraint instanceof MultiConstraint || !$constraint->isDisjunctive()) {
+            return $constraint->getLowerBound()->getVersion();
+        }
+
+        $min = null;
+        foreach ($constraint->getConstraints() as $alternative) {
+            $bound = $this->getLowerBound($alternative);
+            if ($min === null || Comparator::compare($bound, $min) < 0) {
+                $min = $bound;
+            }
+        }
+
+        return $min ?? $constraint->getLowerBound()->getVersion();
     }
 }
