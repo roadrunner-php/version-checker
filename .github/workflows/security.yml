@@ -1,56 +1,57 @@
-on:
-    pull_request: null
-    push:
-        branches:
-            - 1.x
+---
 
-name: build
+name: 🔐 Security analysis
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+  push:
+    branches: [1.x]
+
+# `head_ref` is the PR source branch on `pull_request` events and empty on `push`
+# (falls back to `github.ref` = `refs/heads/<branch>`). Different PRs from different
+# branches → different groups, so they never cross-cancel. Same PR pushed again
+# → same group, the new run cancels the previous one.
+#
+# `cancel-in-progress` is only enabled on PR events: pushes to the default branch
+# (1.x) keep their full history of CI runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-    security:
-        name: Security
-        runs-on: ${{ matrix.os }}
+  security-analysis:
+    timeout-minutes: 4
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+        php-version:
+          - '8.2'
+        dependencies:
+          - highest
+    steps:
+      - name: 📦 Check out the codebase
+        uses: actions/checkout@v7
 
-        strategy:
-            fail-fast: false
-            matrix:
-                php: ['8.2']
-                os: [ubuntu-latest]
+      - name: 🛠️ Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          ini-values: error_reporting=E_ALL
+          coverage: none
 
-        steps:
-            - name: Set Git To Use LF
-              run: |
-                  git config --global core.autocrlf false
-                  git config --global core.eol lf
-            - name: Checkout
-              uses: actions/checkout@v6
+      - name: 🛠️ Setup problem matchers
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-            - name: Setup PHP ${{ matrix.php }}
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: ${{ matrix.php }}
+      - name: 🤖 Validate composer.json
+        run: composer validate --ansi --strict
 
-            - name: Validate Composer
-              run: composer validate
+      - name: 📥 Install dependencies with composer
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: ${{ matrix.dependencies }}
 
-            - name: Get Composer Cache Directory
-                # Docs: <https://github.com/actions/cache/blob/master/examples.md#php---composer>
-              id: composer-cache
-              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-            - name: Restore Composer Cache
-              uses: actions/cache@v5
-              with:
-                  path: ${{ steps.composer-cache.outputs.dir }}
-                  key: ${{ runner.os }}-${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
-                  restore-keys: ${{ runner.os }}-${{ matrix.php }}-composer-
-
-            - name: Install Dependencies
-              uses: nick-invision/retry@v3
-              with:
-                  timeout_minutes: 5
-                  max_attempts: 5
-                  command: composer update --prefer-dist --no-interaction --no-progress
-
-            - name: Security Advisories
-              run: composer require --dev roave/security-advisories:dev-latest
+      - name: 🐛 Check installed packages for security vulnerability advisories
+        run: composer audit --ansi
