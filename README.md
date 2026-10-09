@@ -1,28 +1,40 @@
-# RoadRunner VersionChecker
+<p align="center">
+    <a href="https://roadrunner.dev"><picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/roadrunner-server/.github/assets/8040338/e6bde856-4ec6-4a52-bd5b-bfe78736c1ff">
+        <img alt="RoadRunner" src="https://github.com/roadrunner-server/.github/assets/8040338/040fb694-1dd3-4865-9d29-8e0748c2c8b8" style="width: 6in; display: block">
+    </picture></a>
+</p>
 
-[![PHP Version Require](https://poser.pugx.org/roadrunner-php/version-checker/require/php)](https://packagist.org/packages/roadrunner-php/version-checker)
-[![Latest Stable Version](https://poser.pugx.org/roadrunner-php/version-checker/v/stable)](https://packagist.org/packages/roadrunner-php/version-checker)
-[![testo](https://github.com/roadrunner-php/version-checker/actions/workflows/testo.yml/badge.svg)](https://github.com/roadrunner-php/version-checker/actions)
-[![psalm](https://github.com/roadrunner-php/version-checker/actions/workflows/psalm.yml/badge.svg)](https://github.com/roadrunner-php/version-checker/actions)
-[![Codecov](https://codecov.io/gh/roadrunner-php/version-checker/branch/master/graph/badge.svg)](https://codecov.io/gh/roadrunner-php/version-checker)
-[![Total Downloads](https://poser.pugx.org/roadrunner-php/version-checker/downloads)](https://packagist.org/roadrunner-php/version-checker/phpunit)
-<a href="https://discord.gg/8bZsjYhVVk"><img src="https://img.shields.io/badge/discord-chat-magenta.svg"></a>
+<p align="center">Check the installed RoadRunner version from PHP</p>
 
-## Requirements
+<div align="center">
 
-Make sure that your server is configured with following PHP version and extensions:
+[![Documentation](https://img.shields.io/badge/Documentation-blue?style=for-the-badge&logo=gitbook&logoColor=white)](https://docs.roadrunner.dev)
+[![Sponsor](https://img.shields.io/static/v1?style=for-the-badge&label=&message=Sponsor&logo=githubsponsors&logoColor=white&color=%23EA4AAA)](https://github.com/sponsors/roadrunner-server)
 
-- PHP 8.2+
+[![Psalm Level](https://shepherd.dev/github/roadrunner-php/version-checker/level.svg)](https://shepherd.dev/github/roadrunner-php/version-checker)
+[![Type Coverage](https://shepherd.dev/github/roadrunner-php/version-checker/coverage.svg)](https://shepherd.dev/github/roadrunner-php/version-checker)
 
-## Installation
+</div>
 
-You can install the package via composer:
+<br />
+
+The package finds out which RoadRunner version is installed and checks it against a version constraint, so an application or a library can fail early with a clear message instead of running against an incompatible server. RoadRunner 2.x, 2023.x–2025.x and 3.x are supported.
+
+## Get Started
+
+### Installation
 
 ```bash
 composer require roadrunner-php/version-checker
 ```
 
-## Usage
+[![PHP](https://img.shields.io/packagist/php-v/roadrunner-php/version-checker.svg?style=flat-square&logo=php)](https://packagist.org/packages/roadrunner-php/version-checker)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/roadrunner-php/version-checker.svg?style=flat-square&logo=packagist)](https://packagist.org/packages/roadrunner-php/version-checker)
+[![License](https://img.shields.io/packagist/l/roadrunner-php/version-checker.svg?style=flat-square)](LICENSE)
+[![Total Downloads](https://img.shields.io/packagist/dt/roadrunner-php/version-checker.svg?style=flat-square)](https://packagist.org/packages/roadrunner-php/version-checker/stats)
+
+### Usage
 
 Use the `RoadRunner\VersionChecker\VersionChecker` methods to check the compatibility of the installed RoadRunner
 version. The VersionChecker class has three public methods:
@@ -47,34 +59,40 @@ use RoadRunner\VersionChecker\Exception\UnsupportedVersionException;
 $checker = new VersionChecker();
 
 try {
-    $checker->greaterThan('2023.1');
+    $checker->greaterThan('3.0');
 } catch (UnsupportedVersionException $exception) {
-    var_dump($exception->getMessage()); // Installed RoadRunner version `2.12.3` not supported. Requires version `2023.1` or higher.
-    var_dump($exception->getInstalledVersion()); // 2.12.3
-    var_dump($exception->getRequestedVersion()); // 2023.1
+    var_dump($exception->getMessage()); // Installed RoadRunner version `2025.1.5` not supported. Requires version `3.0` or higher.
+    var_dump($exception->getInstalledVersion()); // 2025.1.5
+    var_dump($exception->getRequestedVersion()); // 3.0
 }
 
 try {
-    $checker->lessThan('2.11');
+    $checker->lessThan('2024.3');
 } catch (UnsupportedVersionException $exception) {
-    var_dump($exception->getMessage()); // Installed RoadRunner version `2.12.3` not supported. Requires version `2.11` or lower.
-    var_dump($exception->getInstalledVersion()); // 2.12.3
-    var_dump($exception->getRequestedVersion()); // 2.11
+    var_dump($exception->getMessage()); // Installed RoadRunner version `2025.1.5` not supported. Requires version `2024.3` or lower.
+    var_dump($exception->getInstalledVersion()); // 2025.1.5
+    var_dump($exception->getRequestedVersion()); // 2024.3
 }
 
 try {
-    $checker->equal('2.11');
+    $checker->equal('3.0');
 } catch (UnsupportedVersionException $exception) {
-    var_dump($exception->getMessage()); // Installed RoadRunner version `2.12.3` not supported. Requires version `2.11`.
-    var_dump($exception->getInstalledVersion()); // 2.12.3
-    var_dump($exception->getRequestedVersion()); // 2.11
+    var_dump($exception->getMessage()); // Installed RoadRunner version `2025.1.5` not supported. Requires version `3.0`.
+    var_dump($exception->getInstalledVersion()); // 2025.1.5
+    var_dump($exception->getRequestedVersion()); // 3.0
 }
 ```
 
-### Path to the RoadRunner binary
+## How the installed version is detected
+
+When the `RR_VERSION` environment variable is set, its value is used as the installed version. Otherwise the
+checker runs `./rr --version` from the current working directory. The detected version is cached for the lifetime of
+the process.
+
+## Path to the RoadRunner binary
 
 To configure the `VersionChecker` to search for the RoadRunner binary in a location other than the default
-(application root with a rr filename), you can bind the `RoadRunner\VersionChecker\Version\InstalledInterface`
+(`./rr`), you can bind the `RoadRunner\VersionChecker\Version\InstalledInterface`
 within application container using the `RoadRunner\VersionChecker\Version\Installed` class and passing the desired
 file path as the **$executablePath** parameter. After that, you can retrieve the VersionChecker class from
 application container.
@@ -84,9 +102,16 @@ Example with Spiral Framework container:
 ```php
 use RoadRunner\VersionChecker\Version\InstalledInterface;
 use RoadRunner\VersionChecker\Version\Installed;
+use RoadRunner\VersionChecker\VersionChecker;
 
 $container->bindSingleton(InstalledInterface::class, new Installed(executablePath: 'some/path'));
 $checker = $container->get(VersionChecker::class);
+```
+
+Without a container, pass the instance directly:
+
+```php
+$checker = new VersionChecker(new Installed(executablePath: 'some/path'));
 ```
 
 ## Testing
@@ -102,7 +127,3 @@ composer psalm
 ```bash
 composer cs
 ```
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
