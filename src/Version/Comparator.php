@@ -26,9 +26,15 @@ final class Comparator implements ComparatorInterface
      * Compares two RoadRunner versions in release order.
      *
      * @return int<-1, 1> Negative when $a is older than $b, positive when newer, zero when equal.
+     *
+     * @throws \UnexpectedValueException When a version cannot be parsed.
      */
     public static function compare(string $a, string $b): int
     {
+        $parser = new VersionParser();
+        $a = $parser->normalize($a);
+        $b = $parser->normalize($b);
+
         $lineA = self::releaseLine($a);
         $lineB = self::releaseLine($b);
 
