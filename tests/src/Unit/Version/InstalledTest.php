@@ -36,7 +36,7 @@ final class InstalledTest
         $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
         $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn($output);
 
-        $installed = new Installed($process);
+        $installed = new Installed($process, new Native(['RR_VERSION' => '']));
 
         Assert::same($installed->getInstalledVersion(), $version);
     }
@@ -92,7 +92,7 @@ final class InstalledTest
         $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
         $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andThrow((new \ReflectionClass(ProcessFailedException::class))->newInstanceWithoutConstructor());
 
-        $installed = new Installed($process);
+        $installed = new Installed($process, new Native(['RR_VERSION' => '']));
 
         Expect::exception(RoadrunnerNotInstalledException::class);
         $installed->getInstalledVersion();
@@ -104,7 +104,7 @@ final class InstalledTest
         $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
         $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn('foo');
 
-        $installed = new Installed($process);
+        $installed = new Installed($process, new Native(['RR_VERSION' => '']));
 
         Expect::exception(RoadrunnerNotInstalledException::class)->withMessageContaining('Unable to determine RoadRunner version.');
         $installed->getInstalledVersion();
