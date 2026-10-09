@@ -13,14 +13,20 @@ final class Package implements PackageInterface
      * @param non-empty-string $packageName
      * @return non-empty-string[]
      */
+    #[\Override]
     public function getRequiredVersions(string $packageName): array
     {
         $versions = [];
         foreach (InstalledVersions::getInstalledPackages() as $package) {
             $path = InstalledVersions::getInstallPath($package);
             if ($path !== null && \file_exists($path . '/composer.json')) {
+                $content = \file_get_contents($path . '/composer.json');
+                if ($content === false) {
+                    continue;
+                }
+
                 /** @var array{require?: array<non-empty-string, non-empty-string>} $composerJson */
-                $composerJson = \json_decode(\file_get_contents($path . '/composer.json'), true);
+                $composerJson = \json_decode($content, true);
 
                 if (
                     isset($composerJson['require'][$packageName]) &&

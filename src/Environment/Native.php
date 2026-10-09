@@ -15,6 +15,7 @@ final class Native implements EnvironmentInterface
     /**
      * @param non-empty-string $name
      */
+    #[\Override]
     public function get(string $name, mixed $default = null): mixed
     {
         return $this->values[$name] ?? $default;

@@ -31,7 +31,7 @@ final class VersionChecker
     }
 
     /**
-     * @param non-empty-string|null $version
+     * @param string|null $version Null or an empty string takes the version from the installed packages.
      *
      * @throws UnsupportedVersionException
      * @throws RoadrunnerNotInstalledException
@@ -39,11 +39,11 @@ final class VersionChecker
      */
     public function greaterThan(?string $version = null): void
     {
-        if (empty($version)) {
+        if ($version === null || $version === '') {
             $version = $this->requiredVersion->getRequiredVersion();
         }
 
-        if (empty($version)) {
+        if ($version === null) {
             throw new RequiredVersionException(
                 'Unable to determine required RoadRunner version.' .
                 ' Please specify the required version in the `$version` parameter.',
@@ -108,9 +108,7 @@ final class VersionChecker
      */
     private function getFormattedMessage(string $message, string $installedVersion, string $version): string
     {
-        \preg_match('/\bv?(\d+)\.(\d+)\.(\d+)\b/', $version, $matches);
-
-        if (!empty($matches[0])) {
+        if (\preg_match('/\bv?(\d+)\.(\d+)\.(\d+)\b/', $version, $matches) === 1) {
             $version = $matches[1] . '.' . $matches[2] . '.' . $matches[3];
         }
 
