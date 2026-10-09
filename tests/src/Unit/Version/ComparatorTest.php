@@ -14,30 +14,6 @@ use Testo\Test;
 #[Test]
 final class ComparatorTest
 {
-    #[DataProvider('greaterThanDataProvider')]
-    public function testGreaterThan(string $requested, string $installed, bool $expected): void
-    {
-        $comparator = new Comparator();
-
-        Assert::same($comparator->greaterThan($requested, $installed), $expected);
-    }
-
-    #[DataProvider('lessThanDataProvider')]
-    public function testLessThan(string $requested, string $installed, bool $expected): void
-    {
-        $comparator = new Comparator();
-
-        Assert::same($comparator->lessThan($requested, $installed), $expected);
-    }
-
-    #[DataProvider('equalDataProvider')]
-    public function testEqual(string $requested, string $installed, bool $expected): void
-    {
-        $comparator = new Comparator();
-
-        Assert::same($comparator->equal($requested, $installed), $expected);
-    }
-
     public static function greaterThanDataProvider(): \Traversable
     {
         // requested version equal to installed version
@@ -130,6 +106,43 @@ final class ComparatorTest
         yield ['2023.1.0-rc.2', '2023.1.0-RC2', true];
     }
 
+    public static function compareDataProvider(): \Traversable
+    {
+        yield ['3.0.0.0', '3.0.0.0', 0];
+        yield ['3.0.0.0', '2025.1.5.0', 1];
+        yield ['2025.1.5.0', '3.0.0.0', -1];
+        yield ['2023.1.0.0-dev', '2.12.3.0', 1];
+        yield ['2.12.3.0', '3.0.0.0-dev', -1];
+        yield ['2025.1.0.0', '2024.3.0.0', 1];
+        yield ['3.0.1.0', '3.0.0.0', 1];
+        yield ['dev-master', '3.0.0.0', -1];
+        yield ['3.0.0.0', 'dev-master', 1];
+    }
+
+    #[DataProvider('greaterThanDataProvider')]
+    public function testGreaterThan(string $requested, string $installed, bool $expected): void
+    {
+        $comparator = new Comparator();
+
+        Assert::same($comparator->greaterThan($requested, $installed), $expected);
+    }
+
+    #[DataProvider('lessThanDataProvider')]
+    public function testLessThan(string $requested, string $installed, bool $expected): void
+    {
+        $comparator = new Comparator();
+
+        Assert::same($comparator->lessThan($requested, $installed), $expected);
+    }
+
+    #[DataProvider('equalDataProvider')]
+    public function testEqual(string $requested, string $installed, bool $expected): void
+    {
+        $comparator = new Comparator();
+
+        Assert::same($comparator->equal($requested, $installed), $expected);
+    }
+
     #[DataProvider('compareDataProvider')]
     public function testCompare(string $a, string $b, int $expected): void
     {
@@ -152,18 +165,5 @@ final class ComparatorTest
 
         Expect::exception(\UnexpectedValueException::class);
         $comparator->greaterThan($requested, '3.0.0');
-    }
-
-    public static function compareDataProvider(): \Traversable
-    {
-        yield ['3.0.0.0', '3.0.0.0', 0];
-        yield ['3.0.0.0', '2025.1.5.0', 1];
-        yield ['2025.1.5.0', '3.0.0.0', -1];
-        yield ['2023.1.0.0-dev', '2.12.3.0', 1];
-        yield ['2.12.3.0', '3.0.0.0-dev', -1];
-        yield ['2025.1.0.0', '2024.3.0.0', 1];
-        yield ['3.0.1.0', '3.0.0.0', 1];
-        yield ['dev-master', '3.0.0.0', -1];
-        yield ['3.0.0.0', 'dev-master', 1];
     }
 }

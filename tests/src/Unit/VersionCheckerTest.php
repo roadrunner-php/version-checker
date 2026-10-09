@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Tests\Unit;
 
-use Mockery;
 use RoadRunner\VersionChecker\Exception\RequiredVersionException;
 use RoadRunner\VersionChecker\Exception\UnsupportedVersionException;
 use RoadRunner\VersionChecker\Version\Comparator;
@@ -20,19 +19,35 @@ use Testo\Test;
 #[Test]
 final class VersionCheckerTest
 {
+    public static function invalidVersionsDataProvider(): \Traversable
+    {
+        yield [''];
+        yield [null];
+    }
+
+    public static function getFormattedMessageDataProvider(): \Traversable
+    {
+        yield ['1', '1'];
+        yield ['1.1', '1.1'];
+        yield ['1.2.3', '1.2.3'];
+        yield ['1.2.3.4', '1.2.3'];
+        yield ['v1.2.3.4', '1.2.3'];
+        yield ['2023.1.0.0-dev', '2023.1.0'];
+    }
+
     #[DataProvider('invalidVersionsDataProvider')]
     public function testSuccessGreaterThanWithoutVersion(?string $version = null): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('greaterThan')->once()->andReturn(true);
 
-        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion = \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
         $requiredVersion->shouldReceive('getRequiredVersion')->once()->andReturn('1.0');
 
         $checker = new VersionChecker(
-            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
+            \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
             $requiredVersion,
-            $comparator
+            $comparator,
         );
 
         $checker->greaterThan($version);
@@ -40,16 +55,16 @@ final class VersionCheckerTest
 
     public function testSuccessGreaterThanWithVersion(): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('greaterThan')->once()->andReturn(true);
 
-        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion = \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
         $requiredVersion->shouldReceive('getRequiredVersion')->never();
 
         $checker = new VersionChecker(
-            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
+            \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
             $requiredVersion,
-            $comparator
+            $comparator,
         );
 
         $checker->greaterThan('1.0');
@@ -57,16 +72,16 @@ final class VersionCheckerTest
 
     public function testGreaterThanWithoutVersionAndWithoutRoadRunnerPackage(): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('greaterThan')->never();
 
-        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion = \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
         $requiredVersion->shouldReceive('getRequiredVersion')->once()->andReturn(null);
 
         $checker = new VersionChecker(
-            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
+            \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
             $requiredVersion,
-            $comparator
+            $comparator,
         );
 
         Expect::exception(RequiredVersionException::class);
@@ -76,13 +91,13 @@ final class VersionCheckerTest
     #[DataProvider('invalidVersionsDataProvider')]
     public function testFailGreaterThanWithoutVersion(?string $version = null): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('greaterThan')->once()->andReturn(false);
 
-        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion = \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
         $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('1.0');
 
-        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion = \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
         $requiredVersion->shouldReceive('getRequiredVersion')->andReturn('2023.1');
 
         $checker = new VersionChecker($installedVersion, $requiredVersion, $comparator);
@@ -99,13 +114,13 @@ final class VersionCheckerTest
 
     public function testFailGreaterThanWithVersion(): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('greaterThan')->once()->andReturn(false);
 
-        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion = \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
         $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('1.0');
 
-        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion = \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
         $requiredVersion->shouldReceive('getRequiredVersion')->never();
 
         $checker = new VersionChecker($installedVersion, $requiredVersion, $comparator);
@@ -122,10 +137,10 @@ final class VersionCheckerTest
 
     public function testGreaterThanTreatsZeroAsVersion(): void
     {
-        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion = \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
         $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('2.12.3');
 
-        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion = \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
         $requiredVersion->shouldReceive('getRequiredVersion')->never();
 
         $checker = new VersionChecker($installedVersion, $requiredVersion, new Comparator());
@@ -135,10 +150,10 @@ final class VersionCheckerTest
 
     public function testFailGreaterThanReportsRequiredVersionWithoutStability(): void
     {
-        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion = \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
         $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('2.12.3');
 
-        $requiredVersion = Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
+        $requiredVersion = \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing();
         $requiredVersion->shouldReceive('getRequiredVersion')->once()->andReturn('2023.1.0.0-dev');
 
         $checker = new VersionChecker($installedVersion, $requiredVersion, new Comparator());
@@ -150,13 +165,13 @@ final class VersionCheckerTest
 
     public function testSuccessLessThan(): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('lessThan')->once()->andReturn(true);
 
         $checker = new VersionChecker(
-            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
-            Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
-            $comparator
+            \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
+            \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
+            $comparator,
         );
 
         $checker->lessThan('2.0');
@@ -164,16 +179,16 @@ final class VersionCheckerTest
 
     public function testFailLessThan(): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('lessThan')->once()->andReturn(false);
 
-        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion = \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
         $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('2.0');
 
         $checker = new VersionChecker(
             $installedVersion,
-            Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
-            $comparator
+            \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
+            $comparator,
         );
 
         try {
@@ -188,13 +203,13 @@ final class VersionCheckerTest
 
     public function testSuccessEqual(): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('equal')->once()->andReturn(true);
 
         $checker = new VersionChecker(
-            Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
-            Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
-            $comparator
+            \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing(),
+            \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
+            $comparator,
         );
 
         $checker->equal('2.0');
@@ -202,16 +217,16 @@ final class VersionCheckerTest
 
     public function testFailEqual(): void
     {
-        $comparator = Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
+        $comparator = \Mockery::mock(ComparatorInterface::class)->shouldIgnoreMissing();
         $comparator->shouldReceive('equal')->once()->andReturn(false);
 
-        $installedVersion = Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
+        $installedVersion = \Mockery::mock(InstalledInterface::class)->shouldIgnoreMissing();
         $installedVersion->shouldReceive('getInstalledVersion')->once()->andReturn('2.0');
 
         $checker = new VersionChecker(
             $installedVersion,
-            Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
-            $comparator
+            \Mockery::mock(RequiredInterface::class)->shouldIgnoreMissing(),
+            $comparator,
         );
 
         try {
@@ -232,21 +247,5 @@ final class VersionCheckerTest
         $ref->setAccessible(true);
 
         Assert::same($ref->invoke($checker, 'installed %s required %s', '1', $version), \sprintf('installed 1 required %s', $expected));
-    }
-
-    public static function invalidVersionsDataProvider(): \Traversable
-    {
-        yield [''];
-        yield [null];
-    }
-
-    public static function getFormattedMessageDataProvider(): \Traversable
-    {
-        yield ['1', '1'];
-        yield ['1.1', '1.1'];
-        yield ['1.2.3', '1.2.3'];
-        yield ['1.2.3.4', '1.2.3'];
-        yield ['v1.2.3.4', '1.2.3'];
-        yield ['2023.1.0.0-dev', '2023.1.0'];
     }
 }

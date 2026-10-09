@@ -12,6 +12,13 @@ use Testo\Test;
 #[Test]
 final class NativeTest
 {
+    public static function valuesDataProvider(): \Traversable
+    {
+        yield ['2.12.3', '2.12.3', '1'];
+        yield [1, 1, '2'];
+        yield [true, true, '3'];
+    }
+
     #[DataProvider('valuesDataProvider')]
     public function testGet(mixed $value, mixed $expected, string $key): void
     {
@@ -22,13 +29,5 @@ final class NativeTest
         ]);
 
         Assert::same($native->get($key), $expected);
-    }
-
-
-    public static function valuesDataProvider(): \Traversable
-    {
-        yield ['2.12.3', '2.12.3', '1'];
-        yield [1, 1, '2'];
-        yield [true, true, '3'];
     }
 }
