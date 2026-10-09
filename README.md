@@ -125,5 +125,5 @@ composer psalm
 ```
 
 ```bash
-composer cs
+composer cs:diff
 ```

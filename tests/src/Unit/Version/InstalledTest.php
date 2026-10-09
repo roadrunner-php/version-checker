@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace RoadRunner\VersionChecker\Tests\Unit\Version;
 
-use Mockery;
 use RoadRunner\VersionChecker\Environment\EnvironmentInterface;
 use RoadRunner\VersionChecker\Environment\Native;
 use RoadRunner\VersionChecker\Exception\RoadrunnerNotInstalledException;
@@ -20,21 +19,19 @@ use Testo\Test;
 
 final class InstalledTest
 {
-    #[AfterTest]
-    protected function tearDown(): void
+    public static function outputDataProvider(): \Traversable
     {
-        // clean the cache
-        $ref = new \ReflectionProperty(Installed::class, 'cachedVersion');
-        $ref->setAccessible(true);
-        $ref->setValue(null);
+        yield ['2.12.3', 'rr version 2.12.3 (build time: 2023-02-16T13:08:23+0000, go1.20), OS: darwin, arch: arm64'];
+        yield ['2023.1.0-rc.2', 'rr version 2023.1.0-rc.2 (build time: 2023-02-16T13:08:23+0000, go1.20)'];
+        yield ['2023.1.0-beta', 'version 2023.1.0-beta'];
     }
 
     #[Test]
     #[DataProvider('outputDataProvider')]
     public function testGetInstalledVersion(string $version, string $output): void
     {
-        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
-        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn($output);
+        $process = \Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], \Mockery::andAnyOtherArgs())->andReturn($output);
 
         $installed = new Installed($process, new Native(['RR_VERSION' => '']));
 
@@ -44,8 +41,8 @@ final class InstalledTest
     #[Test]
     public function testCachedVersion(): void
     {
-        $env = Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
-        $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn('2023.1.0');
+        $env = \Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
+        $env->shouldReceive('get')->once()->with('RR_VERSION', \Mockery::andAnyOtherArgs())->andReturn('2023.1.0');
 
         $installed = new Installed(environment: $env);
 
@@ -59,10 +56,10 @@ final class InstalledTest
     #[Test]
     public function testEnvironmentVersionTakesPrecedenceOverConsoleCommand(): void
     {
-        $env = Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
-        $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn('2023.1.0');
+        $env = \Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
+        $env->shouldReceive('get')->once()->with('RR_VERSION', \Mockery::andAnyOtherArgs())->andReturn('2023.1.0');
 
-        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process = \Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
         $process->shouldNotReceive('exec');
 
         $installed = new Installed($process, $env);
@@ -75,11 +72,11 @@ final class InstalledTest
     #[DataSet([''], 'empty string')]
     public function testConsoleCommandIsUsedWithoutEnvironmentVersion(?string $envValue): void
     {
-        $env = Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
-        $env->shouldReceive('get')->once()->with('RR_VERSION', Mockery::andAnyOtherArgs())->andReturn($envValue);
+        $env = \Mockery::mock(EnvironmentInterface::class)->shouldIgnoreMissing();
+        $env->shouldReceive('get')->once()->with('RR_VERSION', \Mockery::andAnyOtherArgs())->andReturn($envValue);
 
-        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
-        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn('version 2023.1.0');
+        $process = \Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], \Mockery::andAnyOtherArgs())->andReturn('version 2023.1.0');
 
         $installed = new Installed($process, $env);
 
@@ -89,8 +86,8 @@ final class InstalledTest
     #[Test]
     public function testGetInstalledVersionRoadRunnerIsNotInstalled(): void
     {
-        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
-        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andThrow((new \ReflectionClass(ProcessFailedException::class))->newInstanceWithoutConstructor());
+        $process = \Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], \Mockery::andAnyOtherArgs())->andThrow((new \ReflectionClass(ProcessFailedException::class))->newInstanceWithoutConstructor());
 
         $installed = new Installed($process, new Native(['RR_VERSION' => '']));
 
@@ -101,8 +98,8 @@ final class InstalledTest
     #[Test]
     public function testGetInstalledVersionUnableToDetermineVersion(): void
     {
-        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
-        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], Mockery::andAnyOtherArgs())->andReturn('foo');
+        $process = \Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['./rr', '--version'], \Mockery::andAnyOtherArgs())->andReturn('foo');
 
         $installed = new Installed($process, new Native(['RR_VERSION' => '']));
 
@@ -113,8 +110,8 @@ final class InstalledTest
     #[Test]
     public function testConsoleCommandUsesExecutablePath(): void
     {
-        $process = Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
-        $process->shouldReceive('exec')->once()->with(['/opt/bin/rr', '--version'], Mockery::andAnyOtherArgs())->andReturn('rr version 2024.3.0');
+        $process = \Mockery::mock(ProcessInterface::class)->shouldIgnoreMissing();
+        $process->shouldReceive('exec')->once()->with(['/opt/bin/rr', '--version'], \Mockery::andAnyOtherArgs())->andReturn('rr version 2024.3.0');
 
         $installed = new Installed($process, new Native(['RR_VERSION' => '']), '/opt/bin/rr');
 
@@ -131,10 +128,12 @@ final class InstalledTest
         $installed->getInstalledVersion();
     }
 
-    public static function outputDataProvider(): \Traversable
+    #[AfterTest]
+    protected function tearDown(): void
     {
-        yield ['2.12.3', 'rr version 2.12.3 (build time: 2023-02-16T13:08:23+0000, go1.20), OS: darwin, arch: arm64'];
-        yield ['2023.1.0-rc.2', 'rr version 2023.1.0-rc.2 (build time: 2023-02-16T13:08:23+0000, go1.20)'];
-        yield ['2023.1.0-beta', 'version 2023.1.0-beta'];
+        // clean the cache
+        $ref = new \ReflectionProperty(Installed::class, 'cachedVersion');
+        $ref->setAccessible(true);
+        $ref->setValue(null);
     }
 }

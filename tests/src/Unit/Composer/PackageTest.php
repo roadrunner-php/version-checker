@@ -17,11 +17,43 @@ final class PackageTest
 {
     private const FIXTURES = __DIR__ . '/../../../fixtures/packages';
 
-    #[AfterTest]
-    protected function restoreInstalledVersions(): void
+    public static function isSupportedVersionDataProvider(): \Traversable
     {
-        // Null drops the override, so the next lookup reads vendor/composer/installed.php again.
-        InstalledVersions::reload(null);
+        yield ['1.0', true];
+        yield ['1.0.0', true];
+        yield ['^1.0', true];
+        yield ['>=1.0', true];
+        yield ['>1.0', true];
+        yield ['1.0.*', true];
+        yield ['^1.0 | ^2.0', true];
+        yield ['^1.0 || ^2.0', true];
+        yield ['1.0 - 2.0', true];
+        yield ['dev-master', false];
+        yield ['dev-feature/some', false];
+        yield ['<2.0', true];
+        yield ['<=2.0', true];
+        yield ['*', true];
+        yield ['latest', false];
+    }
+
+    public static function getMinVersionDataProvider(): \Traversable
+    {
+        yield ['1.0', '1.0.0.0'];
+        yield ['1.0.0', '1.0.0.0'];
+        yield ['^1.0', '1.0.0.0-dev'];
+        yield ['>=1.0', '1.0.0.0-dev'];
+        yield ['>1.0', '1.0.0.0'];
+        yield ['1.0.*', '1.0.0.0-dev'];
+        yield ['1.0.1', '1.0.1.0'];
+        yield ['1.1.*', '1.1.0.0-dev'];
+        yield ['1.1.1', '1.1.1.0'];
+        yield ['^1.0 | ^2.0', '1.0.0.0-dev'];
+        yield ['^1.0 || ^2.0', '1.0.0.0-dev'];
+        yield ['1.0 - 2.0', '1.0.0.0-dev'];
+        yield ['<2.0', '0.0.0.0-dev'];
+        yield ['<=2.0', '0.0.0.0-dev'];
+        yield ['*', '0.0.0.0-dev'];
+        yield ['^2023.1 || ^2024.1', '2023.1.0.0-dev'];
     }
 
     public function testGetRequiredVersionsReturnsLowerBoundsOfSupportedConstraints(): void
@@ -85,43 +117,11 @@ final class PackageTest
         Assert::same($ref->invoke($package, $version), $expected);
     }
 
-    public static function isSupportedVersionDataProvider(): \Traversable
+    #[AfterTest]
+    protected function restoreInstalledVersions(): void
     {
-        yield ['1.0', true];
-        yield ['1.0.0', true];
-        yield ['^1.0', true];
-        yield ['>=1.0', true];
-        yield ['>1.0', true];
-        yield ['1.0.*', true];
-        yield ['^1.0 | ^2.0', true];
-        yield ['^1.0 || ^2.0', true];
-        yield ['1.0 - 2.0', true];
-        yield ['dev-master', false];
-        yield ['dev-feature/some', false];
-        yield ['<2.0', true];
-        yield ['<=2.0', true];
-        yield ['*', true];
-        yield ['latest', false];
-    }
-
-    public static function getMinVersionDataProvider(): \Traversable
-    {
-        yield ['1.0', '1.0.0.0'];
-        yield ['1.0.0', '1.0.0.0'];
-        yield ['^1.0', '1.0.0.0-dev'];
-        yield ['>=1.0', '1.0.0.0-dev'];
-        yield ['>1.0', '1.0.0.0'];
-        yield ['1.0.*', '1.0.0.0-dev'];
-        yield ['1.0.1', '1.0.1.0'];
-        yield ['1.1.*', '1.1.0.0-dev'];
-        yield ['1.1.1', '1.1.1.0'];
-        yield ['^1.0 | ^2.0', '1.0.0.0-dev'];
-        yield ['^1.0 || ^2.0', '1.0.0.0-dev'];
-        yield ['1.0 - 2.0', '1.0.0.0-dev'];
-        yield ['<2.0', '0.0.0.0-dev'];
-        yield ['<=2.0', '0.0.0.0-dev'];
-        yield ['*', '0.0.0.0-dev'];
-        yield ['^2023.1 || ^2024.1', '2023.1.0.0-dev'];
+        // Null drops the override, so the next lookup reads vendor/composer/installed.php again.
+        InstalledVersions::reload(null);
     }
 
     private static function installedPackage(string $name, string $installPath): array
