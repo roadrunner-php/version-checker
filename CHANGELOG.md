@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/roadrunner-php/version-checker/compare/v1.3.0...v1.4.0) (2026-10-10)
+
+
+### Features
+
+* rename the package to roadrunner/version-checker ([#29](https://github.com/roadrunner-php/version-checker/issues/29)) ([07e19c9](https://github.com/roadrunner-php/version-checker/commit/07e19c9cf8a59bd5fc0f7b05b2d0aee616efef20))
+
+
+### Documentation
+
+* refresh README header, badges and examples ([#25](https://github.com/roadrunner-php/version-checker/issues/25)) ([e354cfb](https://github.com/roadrunner-php/version-checker/commit/e354cfb6937ae01538a2fb389712aa0008dabeb6))
+
 ## [1.3.0](https://github.com/roadrunner-php/version-checker/compare/v1.2.0...v1.3.0) (2026-10-09)
 
 
