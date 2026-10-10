@@ -1,18 +1,46 @@
 {
-    "name": "roadrunner-php/version-checker",
-    "description": "The package for checking the version of the RoadRunner",
+    "name": "roadrunner/version-checker",
+    "type": "library",
+    "description": "Checks that the installed RoadRunner binary matches the version required by the project's Composer packages",
     "keywords": [
-        "roadrunner-php",
         "roadrunner",
-        "version-checker"
+        "version",
+        "version-checker",
+        "semver",
+        "compatibility"
     ],
-    "homepage": "https://github.com/roadrunner-php/version-checker",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Maksim Smakouz",
+            "homepage": "https://github.com/msmakouz"
+        },
+        {
+            "name": "Aleksei Gagarin",
+            "homepage": "https://github.com/roxblnfk"
+        },
+        {
+            "name": "RoadRunner Community",
+            "homepage": "https://github.com/roadrunner-server/roadrunner/graphs/contributors"
+        }
+    ],
+    "homepage": "https://roadrunner.dev/",
+    "support": {
+        "issues": "https://github.com/roadrunner-server/roadrunner/issues",
+        "source": "https://github.com/roadrunner-php/version-checker",
+        "chat": "https://discord.gg/V6EK4he"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/roadrunner-server"
+        }
+    ],
     "require": {
         "php": "^8.2",
-        "symfony/process": "^5.4 || ^6.0 || ^7.0 || ^8.0",
         "composer-runtime-api": "^2.0",
-        "composer/semver": "^3.3"
+        "composer/semver": "^3.3",
+        "symfony/process": "^5.4 || ^6.0 || ^7.0 || ^8.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.6",
@@ -20,6 +48,9 @@
         "testo/bridge-mockery": "^0.1.2",
         "testo/testo": "^0.10.55",
         "vimeo/psalm": "^6 || ^7"
+    },
+    "replace": {
+        "roadrunner-php/version-checker": "self.version"
     },
     "autoload": {
         "psr-4": {
