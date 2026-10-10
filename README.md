@@ -27,13 +27,13 @@ The package finds out which RoadRunner version is installed and checks it agains
 ### Installation
 
 ```bash
-composer require roadrunner-php/version-checker
+composer require roadrunner/version-checker
 ```
 
-[![PHP](https://img.shields.io/packagist/php-v/roadrunner-php/version-checker.svg?style=flat-square&logo=php)](https://packagist.org/packages/roadrunner-php/version-checker)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/roadrunner-php/version-checker.svg?style=flat-square&logo=packagist)](https://packagist.org/packages/roadrunner-php/version-checker)
-[![License](https://img.shields.io/packagist/l/roadrunner-php/version-checker.svg?style=flat-square)](LICENSE)
-[![Total Downloads](https://img.shields.io/packagist/dt/roadrunner-php/version-checker.svg?style=flat-square)](https://packagist.org/packages/roadrunner-php/version-checker/stats)
+[![PHP](https://img.shields.io/packagist/php-v/roadrunner/version-checker.svg?style=flat-square&logo=php)](https://packagist.org/packages/roadrunner/version-checker)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/roadrunner/version-checker.svg?style=flat-square&logo=packagist)](https://packagist.org/packages/roadrunner/version-checker)
+[![License](https://img.shields.io/packagist/l/roadrunner/version-checker.svg?style=flat-square)](LICENSE)
+[![Total Downloads](https://img.shields.io/packagist/dt/roadrunner/version-checker.svg?style=flat-square)](https://packagist.org/packages/roadrunner/version-checker/stats)
 
 ### Usage
 
