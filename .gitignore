@@ -1,8 +1,7 @@
-.idea
-build
-composer.lock
-coverage
-docs
-vendor
-node_modules
-runtime
+/.*/
+!/.github/
+/runtime/
+/vendor/
+/composer.lock
+/.env
+*.log
