@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/roadrunner-php/version-checker/compare/v1.4.0...v1.4.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* detect the RoadRunner version from roadrunner/roadrunner ([db8a121](https://github.com/roadrunner-php/version-checker/commit/db8a121133d5e378e418a38770ca67fdcb4c08c4))
+
 ## [1.4.0](https://github.com/roadrunner-php/version-checker/compare/v1.3.0...v1.4.0) (2026-10-10)
 
 
