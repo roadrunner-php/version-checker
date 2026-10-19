@@ -59,10 +59,7 @@ final class RequiredTest
 
     public function testGetRequiredVersion(): void
     {
-        $package = \Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
-        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner', \Mockery::andAnyOtherArgs())->andReturn(['2.0', '1.0', '2.0.0.0-dev', '2.0.0-alpha']);
-
-        $required = new Required($package);
+        $required = new Required(self::package(['2.0', '1.0', '2.0.0.0-dev', '2.0.0-alpha']));
 
         Assert::same($required->getRequiredVersion(), '2.0');
     }
@@ -70,30 +67,35 @@ final class RequiredTest
     #[DataProvider('releaseLinesDataProvider')]
     public function testGetRequiredVersionPicksLatestReleaseLine(array $versions, string $expected): void
     {
-        $package = \Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
-        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner', \Mockery::andAnyOtherArgs())->andReturn($versions);
-
-        $required = new Required($package);
+        $required = new Required(self::package($versions));
 
         Assert::same($required->getRequiredVersion(), $expected);
     }
 
+    public function testGetRequiredVersionFromOldPackageName(): void
+    {
+        $required = new Required(self::package([], ['2023.1.0.0-dev']));
+
+        Assert::same($required->getRequiredVersion(), '2023.1.0.0-dev');
+    }
+
+    public function testGetRequiredVersionFromBothPackageNames(): void
+    {
+        $required = new Required(self::package(['3.0.0.0-dev'], ['2025.1.0.0-dev']));
+
+        Assert::same($required->getRequiredVersion(), '3.0.0.0-dev');
+    }
+
     public function testGetRequiredVersionWithoutRoadRunnerRequirement(): void
     {
-        $package = \Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
-        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner', \Mockery::andAnyOtherArgs())->andReturn([]);
-
-        $required = new Required($package);
+        $required = new Required(self::package([]));
 
         Assert::null($required->getRequiredVersion());
     }
 
     public function testGetCachedVersion(): void
     {
-        $package = \Mockery::mock(PackageInterface::class)->shouldIgnoreMissing();
-        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner', \Mockery::andAnyOtherArgs())->andReturn(['1.0']);
-
-        $required = new Required($package);
+        $required = new Required(self::package(['1.0']));
 
         Assert::same($required->getRequiredVersion(), '1.0');
         Assert::same($required->getRequiredVersion(), '1.0');
@@ -106,5 +108,14 @@ final class RequiredTest
         $ref = new \ReflectionProperty(Required::class, 'cachedVersion');
         $ref->setAccessible(true);
         $ref->setValue(null);
+    }
+
+    private static function package(array $versions, array $oldNameVersions = []): PackageInterface
+    {
+        $package = \Mockery::mock(PackageInterface::class);
+        $package->shouldReceive('getRequiredVersions')->once()->with('roadrunner/roadrunner')->andReturn($versions);
+        $package->shouldReceive('getRequiredVersions')->once()->with('spiral/roadrunner')->andReturn($oldNameVersions);
+
+        return $package;
     }
 }

@@ -9,7 +9,10 @@ use RoadRunner\VersionChecker\Composer\PackageInterface;
 
 final class Required implements RequiredInterface
 {
-    private const ROADRUNNER_PACKAGE = 'spiral/roadrunner';
+    /**
+     * The metapackage was renamed without `replace`, so packages may still require the old name.
+     */
+    private const ROADRUNNER_PACKAGES = ['roadrunner/roadrunner', 'spiral/roadrunner'];
 
     /**
      * @var non-empty-string|null
@@ -33,8 +36,10 @@ final class Required implements RequiredInterface
             return self::$cachedVersion;
         }
 
-        foreach ($this->package->getRequiredVersions(self::ROADRUNNER_PACKAGE) as $packageVersion) {
-            self::$cachedVersion = $this->getMaximumVersion($packageVersion, self::$cachedVersion);
+        foreach (self::ROADRUNNER_PACKAGES as $packageName) {
+            foreach ($this->package->getRequiredVersions($packageName) as $packageVersion) {
+                self::$cachedVersion = $this->getMaximumVersion($packageVersion, self::$cachedVersion);
+            }
         }
 
         return self::$cachedVersion;
